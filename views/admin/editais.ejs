@@ -1,0 +1,79 @@
+<%- include('../header.ejs') %>
+
+<section class="bg-white py-24 md:py-40 px-4 animate-on-scroll min-h-screen">
+    <div class="container mx-auto max-w-7xl flex flex-col md:flex-row gap-10">
+        <%- include('../_admin_sidebar.ejs') %>
+        <main class="w-full md:w-3/4 bg-[#f0f0f0] p-10 rounded-3xl shadow-lg">
+            <h2 class="text-4xl font-bold text-[#3B2C5B] mb-8">Painel de Administração - Editais</h2>
+
+            <% if (typeof sucesso !== 'undefined') { %>
+                <div class="bg-green-200 text-green-800 p-4 rounded-md mb-6">
+                    <p>Item adicionado/deletado/alterado com sucesso!</p>
+                </div>
+            <% } %>
+
+            <div id="editais-form" class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-3xl font-bold text-[#3B2C5B]">Editais</h3>
+                    <button id="btn-adicionar-edital" class="bg-[#C46ED8] text-white px-4 py-2 rounded hover:bg-[#8C40B8] transition-colors">Adicionar Edital</button>
+                </div>
+                <div id="form-editais-container" class="hidden mt-8 p-6 bg-white rounded-lg shadow">
+                    <h4 id="form-title-edital" class="text-2xl font-bold text-[#3B2C5B] mb-4">Adicionar Novo Edital</h4>
+                    <form id="form-edital" action="/admin/adicionar-edital" method="POST" class="space-y-6">
+                        <input type="hidden" name="id" id="edital-id-input">
+                        <input type="text" name="titulo" id="edital-titulo-input" placeholder="Título" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <textarea name="descricao" id="edital-descricao-input" placeholder="Descrição" rows="4" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors"></textarea>
+                        <input type="text" name="status" id="edital-status-input" placeholder="Status" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <input type="date" name="data_inicio" id="edital-data_inicio-input" placeholder="Data de Início" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <input type="date" name="data_fim" id="edital-data_fim-input" placeholder="Data de Fim" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <select name="projeto_id" id="edital-projeto_id-input" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                            <option value="">-- Selecione um Projeto --</option>
+                            <% projetos.forEach(item => { %>
+                                <option value="<%= item.id %>"><%= item.titulo %></option>
+                            <% }) %>
+                        </select>
+                        <button type="submit" class="btn-roxo">Salvar</button>
+                    </form>
+                </div>
+                <div class="mt-8">
+                    <h4 class="text-2xl font-bold text-[#3B2C5B] mb-4">Editais Existentes</h4>
+                    <ul class="space-y-4">
+                        <% editais.forEach(item => { %>
+                        <li class="bg-white p-4 rounded-lg shadow flex items-center justify-between">
+                            <div><h5 class="font-bold text-[#3B2C5B]"><%= item.titulo %></h5></div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick='preencherFormEdital(<%= JSON.stringify(item) %>)' class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Alterar</button>
+                                <form action="/admin/deletar-edital/<%= item.id %>" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este item?');">
+                                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">Deletar</button>
+                                </form>
+                            </div>
+                        </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+</section>
+
+<script>
+    function preencherFormEdital(item) {
+        document.getElementById('form-editais-container').classList.remove('hidden');
+        document.getElementById('form-title-edital').innerText = 'Alterar Edital';
+        document.getElementById('form-edital').action = '/admin/alterar-edital/' + item.id;
+        document.getElementById('edital-id-input').value = item.id;
+        document.getElementById('edital-titulo-input').value = item.titulo;
+        document.getElementById('edital-descricao-input').value = item.descricao;
+        document.getElementById('edital-status-input').value = item.status;
+        document.getElementById('edital-data_inicio-input').value = item.data_inicio ? new Date(item.data_inicio).toISOString().split('T')[0] : '';
+        document.getElementById('edital-data_fim-input').value = item.data_fim ? new Date(item.data_fim).toISOString().split('T')[0] : '';
+        document.getElementById('edital-projeto_id-input').value = item.projeto_id;
+    }
+    document.getElementById('btn-adicionar-edital').addEventListener('click', function() {
+        document.getElementById('form-editais-container').classList.remove('hidden');
+        document.getElementById('form-title-edital').innerText = 'Adicionar Novo Edital';
+        document.getElementById('form-edital').action = '/admin/adicionar-edital';
+        document.getElementById('form-edital').reset();
+    });
+</script>
+<%- include('../footer.ejs') %>

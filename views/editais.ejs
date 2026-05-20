@@ -1,0 +1,42 @@
+<%- include('header.ejs') %>
+
+<section id="participacao-editais" class="bg-white py-24 md:py-40 px-4 animate-on-scroll">
+    <div class="container mx-auto max-w-7xl">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#3B2C5B] text-center mb-16">Participação em Editais</h2>
+        
+        <div class="grid grid-cols-1 gap-10 max-w-3xl mx-auto">
+            <div class="bg-[#f0f0f0] card-style p-8">
+                <ul class="list-none p-0 m-0 text-gray-700 space-y-6 w-full">
+                    <% editais.forEach(edital => { %>
+                    <li class="mb-6">
+                        <h2 class="text-2xl font-bold text-[#3B2C5B] mb-3"><%= edital.titulo %></h2>
+
+                        <p class="text-lg text-gray-700 leading-relaxed mb-4"><%= edital.descricao %></p>
+                        
+                        <% if (edital.status) { %>
+                        <p class="text-sm text-gray-600"><strong>Status:</strong> <%= edital.status %></p>
+                        <% } %>
+                        
+                        <% if (edital.data_inicio && edital.data_fim) { %>
+                        <p class="text-sm text-gray-600">
+                            <strong>Período:</strong> <%= new Date(edital.data_inicio).toLocaleDateString() %> 
+                            - <%= new Date(edital.data_fim).toLocaleDateString() %>
+                        </p>
+                        <% } %>
+                        
+                        <% if (edital.link_externo) { %>
+                        <p class="mt-2">
+                            <a href="<%= edital.link_externo %>" target="_blank" class="text-blue-500 underline">
+                                Acessar edital completo
+                            </a>
+                        </p>
+                        <% } %>
+                    </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('footer.ejs') %>

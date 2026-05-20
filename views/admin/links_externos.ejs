@@ -1,0 +1,73 @@
+<%- include('../header.ejs') %>
+
+<section class="bg-white py-24 md:py-40 px-4 animate-on-scroll min-h-screen">
+    <div class="container mx-auto max-w-7xl flex flex-col md:flex-row gap-10">
+        <%- include('../_admin_sidebar.ejs') %>
+        <main class="w-full md:w-3/4 bg-[#f0f0f0] p-10 rounded-3xl shadow-lg">
+            <h2 class="text-4xl font-bold text-[#3B2C5B] mb-8">Painel de Administração - Links Externos</h2>
+
+            <% if (typeof sucesso !== 'undefined') { %>
+                <div class="bg-green-200 text-green-800 p-4 rounded-md mb-6">
+                    <p>Item adicionado/deletado/alterado com sucesso!</p>
+                </div>
+            <% } %>
+
+            <div id="links-form" class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-3xl font-bold text-[#3B2C5B]">Links</h3>
+                    <button id="btn-adicionar-link" class="bg-[#C46ED8] text-white px-4 py-2 rounded hover:bg-[#8C40B8] transition-colors">Adicionar Link</button>
+                </div>
+                <div id="form-links-container" class="hidden mt-8 p-6 bg-white rounded-lg shadow">
+                    <h4 id="form-title-link" class="text-2xl font-bold text-[#3B2C5B] mb-4">Adicionar Novo Link</h4>
+                    <form id="form-link" action="/admin/adicionar-link-externo" method="POST" class="space-y-6">
+                        <input type="hidden" name="id" id="link-id-input">
+                        <input type="text" name="titulo" id="link-titulo-input" placeholder="Título do Link" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <input type="url" name="url" id="link-url-input" placeholder="URL Completa (Ex: https://site.com)" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <input type="number" name="ano_c" id="link-ano_c-input" placeholder="Ano de Criação" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <textarea name="descricao" id="link-descricao-input" placeholder="Descrição (Opcional)" rows="3" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors"></textarea>
+                        <button type="submit" class="btn-roxo">Salvar</button>
+                    </form>
+                </div>
+                <div class="mt-8">
+                    <h4 class="text-2xl font-bold text-[#3B2C5B] mb-4">Links Existentes</h4>
+                    <ul class="space-y-4">
+                        <% links.forEach(item => { %>
+                        <li class="bg-white p-4 rounded-lg shadow flex items-center justify-between">
+                            <div>
+                                <h5 class="font-bold text-[#3B2C5B]"><%= item.titulo %> (<%= item.ano_c %>)</h5>
+                                <a href="<%= item.url %>" target="_blank" class="text-sm text-blue-600 hover:underline"><%= item.url %></a>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick='preencherFormLink(<%= JSON.stringify(item) %>)' class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Alterar</button>
+                                <form action="/admin/deletar-link-externo/<%= item.id %>" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este link?');">
+                                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">Deletar</button>
+                                </form>
+                            </div>
+                        </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+</section>
+
+<script>
+    function preencherFormLink(item) {
+        document.getElementById('form-links-container').classList.remove('hidden');
+        document.getElementById('form-title-link').innerText = 'Alterar Link Externo';
+        document.getElementById('form-link').action = '/admin/alterar-link-externo/' + item.id;
+        document.getElementById('link-id-input').value = item.id;
+        document.getElementById('link-titulo-input').value = item.titulo;
+        document.getElementById('link-url-input').value = item.url;
+        document.getElementById('link-ano_c-input').value = item.ano_c;
+        document.getElementById('link-descricao-input').value = item.descricao;
+    }
+    document.getElementById('btn-adicionar-link').addEventListener('click', function() {
+        document.getElementById('form-links-container').classList.remove('hidden');
+        document.getElementById('form-title-link').innerText = 'Adicionar Novo Link';
+        document.getElementById('form-link').action = '/admin/adicionar-link-externo';
+        document.getElementById('form-link').reset();
+    });
+</script>
+<%- include('../footer.ejs') %>

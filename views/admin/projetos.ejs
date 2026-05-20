@@ -1,0 +1,68 @@
+<%- include('../header.ejs') %>
+
+<section class="bg-white py-24 md:py-40 px-4 animate-on-scroll min-h-screen">
+    <div class="container mx-auto max-w-7xl flex flex-col md:flex-row gap-10">
+        <%- include('../_admin_sidebar.ejs') %>
+        <main class="w-full md:w-3/4 bg-[#f0f0f0] p-10 rounded-3xl shadow-lg">
+            <h2 class="text-4xl font-bold text-[#3B2C5B] mb-8">Painel de Administração - Projetos</h2>
+
+            <% if (typeof sucesso !== 'undefined') { %>
+                <div class="bg-green-200 text-green-800 p-4 rounded-md mb-6">
+                    <p>Item adicionado/deletado/alterado com sucesso!</p>
+                </div>
+            <% } %>
+
+            <div id="projetos-form" class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-3xl font-bold text-[#3B2C5B]">Projetos</h3>
+                    <button id="btn-adicionar-projeto" class="bg-[#C46ED8] text-white px-4 py-2 rounded hover:bg-[#8C40B8] transition-colors">Adicionar Projeto</button>
+                </div>
+                <div id="form-projetos-container" class="hidden mt-8 p-6 bg-white rounded-lg shadow">
+                    <h4 id="form-title-projeto" class="text-2xl font-bold text-[#3B2C5B] mb-4">Adicionar Novo Projeto</h4>
+                    <form id="form-projeto" action="/admin/adicionar-projeto" method="POST" class="space-y-6">
+                        <input type="hidden" name="id" id="projeto-id-input">
+                        <input type="text" name="titulo" id="projeto-titulo-input" placeholder="Título" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <textarea name="descricao" id="projeto-descricao-input" placeholder="Descrição" required rows="4" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors"></textarea>
+                        <input type="text" name="imagem_url" id="projeto-imagem_url-input" placeholder="URL da Imagem" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <button type="submit" class="btn-roxo">Salvar</button>
+                    </form>
+                </div>
+                <div class="mt-8">
+                    <h4 class="text-2xl font-bold text-[#3B2C5B] mb-4">Projetos Existentes</h4>
+                    <ul class="space-y-4">
+                        <% projetos.forEach(item => { %>
+                        <li class="bg-white p-4 rounded-lg shadow flex items-center justify-between">
+                            <div><h5 class="font-bold text-[#3B2C5B]"><%= item.titulo %></h5></div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick='preencherFormProjeto(<%= JSON.stringify(item) %>)' class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Alterar</button>
+                                <form action="/admin/deletar-projeto/<%= item.id %>" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este item?');">
+                                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">Deletar</button>
+                                </form>
+                            </div>
+                        </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+</section>
+
+<script>
+    function preencherFormProjeto(item) {
+        document.getElementById('form-projetos-container').classList.remove('hidden');
+        document.getElementById('form-title-projeto').innerText = 'Alterar Projeto';
+        document.getElementById('form-projeto').action = '/admin/alterar-projeto/' + item.id;
+        document.getElementById('projeto-id-input').value = item.id;
+        document.getElementById('projeto-titulo-input').value = item.titulo;
+        document.getElementById('projeto-descricao-input').value = item.descricao;
+        document.getElementById('projeto-imagem_url-input').value = item.imagem_url;
+    }
+    document.getElementById('btn-adicionar-projeto').addEventListener('click', function() {
+        document.getElementById('form-projetos-container').classList.remove('hidden');
+        document.getElementById('form-title-projeto').innerText = 'Adicionar Novo Projeto';
+        document.getElementById('form-projeto').action = '/admin/adicionar-projeto';
+        document.getElementById('form-projeto').reset();
+    });
+</script>
+<%- include('../footer.ejs') %>

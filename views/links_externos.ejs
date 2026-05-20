@@ -1,0 +1,40 @@
+<%- include('header.ejs') %>
+
+<section id="links-externos" class="bg-[#f0f0f0] py-24 md:py-40 px-4 animate-on-scroll">
+    <div class="container mx-auto max-w-7xl">
+        
+        <h2 class="text-4xl md:text-5xl font-bold text-[#3B2C5B] text-center mb-16">
+            Links Externos
+        </h2>
+
+<div class="max-w-4xl mx-auto space-y-16">
+
+            <% Object.keys(porAno).sort((a,b) => b - a).forEach(ano => { %>
+
+<h3 class="text-center text-3xl font-bold text-[#3B2C5B] mb-6">
+                    <%= ano %>
+                </h3>
+                <ul class="list-none p-0 space-y-6">
+                    <% porAno[ano].forEach(link => { %>
+                        
+                        <a href="<%= link.url %>" target="_blank"
+                           class="bg-white card-style p-8 block rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 group">
+
+                            <h2 class="font-bold text-[#3B2C5B] text-2xl mb-3 group-hover:text-[#C46ED8] transition-colors">
+                                <%= link.titulo %>
+                            </h2>
+                            <span class="text-sm font-semibold text-blue-500 mt-4 block group-hover:text-blue-700">
+                                Acessar Recurso Externo &rarr;
+                            </span>
+
+                        </a> 
+                    <% }) %>
+                </ul>
+
+            <% }) %>
+
+        </div>
+    </div>
+</section>
+
+<%- include('footer.ejs') %>

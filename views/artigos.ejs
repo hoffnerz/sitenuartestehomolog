@@ -1,0 +1,35 @@
+<%- include('header.ejs') %>
+
+<section id="artigos" class="bg-white py-24 md:py-40 px-4 animate-on-scroll">
+    <div class="container mx-auto max-w-7xl">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#3B2C5B] text-center mb-16">Artigos Científicos Publicados</h2>
+        
+        <ul class="list-none p-0 m-0 text-gray-700 space-y-6 max-w-4xl mx-auto">
+            <% artigos.forEach(artigo => { %>
+            <li class="bg-white card-style p-6">
+                <h2 class="text-xl font-semibold block mb-2"><%= artigo.titulo %></h2>
+                
+                <p class="text-base text-gray-600 mb-4"><%= artigo.resumo %></p>
+
+                <% if (artigo.data_publicacao) { %>
+                <p class="text-sm text-gray-500">Publicado em: <%= new Date(artigo.data_publicacao).toLocaleDateString() %></p>
+                <% } %>
+                
+                <% if (artigo.projeto_id) { %>
+                <p class="text-sm text-gray-500">Projeto relacionado: <%= artigo.projeto_titulo || 'Desconhecido' %></p>
+                <% } %>
+
+                <% if (artigo.link_externo) { %>
+                <p class="mt-2">
+                    <a href="<%= artigo.link_externo %>" target="_blank" class="text-blue-500 underline">
+                        Acessar artigo completo
+                    </a>
+                </p>
+                <% } %>
+            </li>
+            <% }) %>
+        </ul>
+    </div>
+</section>
+
+<%- include('footer.ejs') %>

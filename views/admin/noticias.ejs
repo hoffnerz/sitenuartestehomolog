@@ -1,0 +1,68 @@
+<%- include('../header.ejs') %>
+
+<section class="bg-white py-24 md:py-40 px-4 animate-on-scroll min-h-screen">
+    <div class="container mx-auto max-w-7xl flex flex-col md:flex-row gap-10">
+        <%- include('../_admin_sidebar.ejs') %>
+        <main class="w-full md:w-3/4 bg-[#f0f0f0] p-10 rounded-3xl shadow-lg">
+            <h2 class="text-4xl font-bold text-[#3B2C5B] mb-8">Painel de Administração - Notícias</h2>
+
+            <% if (typeof sucesso !== 'undefined') { %>
+                <div class="bg-green-200 text-green-800 p-4 rounded-md mb-6">
+                    <p>Item adicionado/deletado/alterado com sucesso!</p>
+                </div>
+            <% } %>
+
+            <div id="noticias-form" class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-3xl font-bold text-[#3B2C5B]">Notícias</h3>
+                    <button id="btn-adicionar-noticia" class="bg-[#C46ED8] text-white px-4 py-2 rounded hover:bg-[#8C40B8] transition-colors">Adicionar Notícia</button>
+                </div>
+                <div id="form-noticias-container" class="hidden mt-8 p-6 bg-white rounded-lg shadow">
+                    <h4 id="form-title-noticia" class="text-2xl font-bold text-[#3B2C5B] mb-4">Adicionar Nova Notícia</h4>
+                    <form id="form-noticia" action="/admin/adicionar-noticia" method="POST" class="space-y-6">
+                        <input type="hidden" name="id" id="noticia-id-input">
+                        <input type="text" name="titulo" id="noticia-titulo-input" placeholder="Título" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <textarea name="conteudo" id="noticia-conteudo-input" placeholder="Conteúdo" required rows="8" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors"></textarea>
+                        <input type="text" name="link_externo" id="noticia-link_externo-input" placeholder="Link Externo" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+                        <button type="submit" class="btn-roxo">Salvar</button>
+                    </form>
+                </div>
+                <div class="mt-8">
+                    <h4 class="text-2xl font-bold text-[#3B2C5B] mb-4">Noticias Existentes</h4>
+                    <ul class="space-y-4">
+                        <% noticias.forEach(item => { %>
+                        <li class="bg-white p-4 rounded-lg shadow flex items-center justify-between">
+                            <div><h5 class="font-bold text-[#3B2C5B]"><%= item.titulo %></h5></div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick='preencherFormNoticia(<%= JSON.stringify(item) %>)' class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Alterar</button>
+                                <form action="/admin/deletar-noticia/<%= item.id %>" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este item?');">
+                                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">Deletar</button>
+                                </form>
+                            </div>
+                        </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+</section>
+
+<script>
+    function preencherFormNoticia(item) {
+        document.getElementById('form-noticias-container').classList.remove('hidden');
+        document.getElementById('form-title-noticia').innerText = 'Alterar Notícia';
+        document.getElementById('form-noticia').action = '/admin/alterar-noticia/' + item.id;
+        document.getElementById('noticia-id-input').value = item.id;
+        document.getElementById('noticia-titulo-input').value = item.titulo;
+        document.getElementById('noticia-conteudo-input').value = item.conteudo;
+        document.getElementById('noticia-link_externo-input').value = item.link_externo;
+    }
+    document.getElementById('btn-adicionar-noticia').addEventListener('click', function() {
+        document.getElementById('form-noticias-container').classList.remove('hidden');
+        document.getElementById('form-title-noticia').innerText = 'Adicionar Nova Notícia';
+        document.getElementById('form-noticia').action = '/admin/adicionar-noticia';
+        document.getElementById('form-noticia').reset();
+    });
+</script>
+<%- include('../footer.ejs') %>

@@ -1,0 +1,30 @@
+<%- include('header.ejs') %>
+
+<section id="noticias" class="bg-white py-24 md:py-40 px-4 animate-on-scroll">
+    <div class="container mx-auto max-w-7xl">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#3B2C5B] text-center mb-16">Últimas Notícias e Destaques</h2>
+        <ul class="list-none p-0 m-0 space-y-8 max-w-4xl mx-auto">
+            <% noticias.forEach(noticia => { %>
+            <li class="bg-[#f0f0f0] card-style p-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between">
+                    <h2 class="text-2xl font-semibold block mb-4 md:mb-0 text-[#3B2C5B]"><%= noticia.titulo %></h2>
+
+                    <small class="text-sm text-gray-600"><%= new Date(noticia.data_publicacao).toLocaleDateString('pt-BR') %></small>
+                </div>
+                
+                <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                    <%= noticia.conteudo.length > 200 ? noticia.conteudo.slice(0, 200) + '...' : noticia.conteudo %>
+                </p>
+                
+                <% if (noticia.link_externo) { %>
+                <div class="mt-4">
+                    <a href="<%= noticia.link_externo %>" target="_blank" class="text-blue-500 underline text-sm">Leia mais</a>
+                </div>
+                <% } %>
+            </li>
+            <% }) %>
+        </ul>
+    </div>
+</section>
+
+<%- include('footer') %>

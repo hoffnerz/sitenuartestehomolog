@@ -1,0 +1,19 @@
+<%- include('../header.ejs') %>
+
+<section class="bg-white py-24 md:py-40 px-4 animate-on-scroll flex items-center justify-center min-h-screen">
+    <div class="container mx-auto max-w-lg card-style p-10 bg-[#f0f0f0] text-center">
+        <h2 class="text-4xl md:text-5xl font-bold text-[#3B2C5B] mb-8">Login do Administrador</h2>
+        <% if (erro) { %>
+            <div class="bg-red-200 text-red-800 p-4 rounded-md mb-6">
+                <%= erro %>
+            </div>
+        <% } %>
+        <form action="/admin/login" method="POST" class="space-y-6">
+            <input type="text" name="email" placeholder="Email" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+            <input type="password" name="senha" placeholder="Senha" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
+            <button type="submit" class="w-full btn-roxo hover:bg-[#8C40B8]">Entrar</button>
+        </form>
+    </div>
+</section>
+
+<%- include('../footer.ejs') %>

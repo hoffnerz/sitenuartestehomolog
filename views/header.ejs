@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NuAR - Núcleo de Animação e Roteiro do IFMS</title>
+    <meta name="description" content="Site oficial do NuAR - Núcleo de Animação e Roteiro do IFMS. Conheça nossos projetos, produções e equipe ">
+    <meta name="keywords" content="NuAR, IFMS, Núcleo de Animação e Roteiro, animação, roteiro, projetos, tecnologia, educação, Campo Grande, MS, Heroínas na Ciência, VOX, CTRL+femme, 3DSTORY">
+    <link rel="icon" src="/Imagens/logonuar.png" type="image/png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="leading-relaxed">
+    <header id="mainHeader" class="bg-[#3B2C5B] text-white py-10 shadow-2xl sticky top-0 z-50 main-header">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between px-4">
+            <div class="flex items-center gap-6">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIqgzSWlM1EQ4CZ8vYqYBVAtYD0yfehFwAfg&s" alt="[Logo do NuAR]" class="h-20 w-auto">
+                <div class="text-5xl md:text-6xl font-bold text-white tracking-wide">
+                    NuAR
+                </div>
+            </div>
+            <div class="text-xl md:text-2xl font-light mt-2 md:mt-0 md:ml-4 opacity-90">
+                Núcleo de Animação e Roteiro do IFMS
+            </div>
+            <div class="flex items-center gap-4">
+                <% if (isAdmin) { %>
+                    <div class="profile-menu">
+                        <img src="<%= userPhoto %>" alt="Foto do Perfil" class="h-16 w-16 rounded-full border-2 border-white object-cover">
+                        <div id="profileDropdown" class="profile-menu-content">
+                            <a href="/admin/logout">Sair</a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <button id="headerMenuBtn" aria-label="Abrir menu de navegação">
+                        ☰
+                    </button>
+                <% } %>
+            </div>
+        </div>
+    </header>
+
+    <div id="sideMenuOverlay" class="menu-overlay">
+        <div class="side-menu">
+            <button class="close-menu-btn" aria-label="Fechar menu">X</button>
+            <a href="/" class="nav-link-side" data-section="inicio">Início</a>
+            <a href="/projetos" class="nav-link-side">Projetos</a>
+            <a href="/noticias" class="nav-link-side">Notícias</a>
+            <a href="/producoes" class="nav-link-side">Produções</a>
+            <a href="/artigos" class="nav-link-side">Artigos</a>
+            <a href="/feiras" class="nav-link-side">Feiras</a>
+            <a href="/editais" class="nav-link-side">Editais</a>
+            <a href="/equipe" class="nav-link-side">Equipe</a>     
+            <a href="/links" class="nav-link-side">Links externos</a>        
+        </div>
+    </div>
