@@ -21,4 +21,4 @@ jobs:
           git fetch origin
           git reset --hard origin/teste
           npm install --omit=dev
-          pm2 restart all
+          sudo systemctl restart nuar_homolog
