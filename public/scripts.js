@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
 
     const headerMenuBtn   = document.getElementById('headerMenuBtn');
@@ -167,11 +166,79 @@ document.addEventListener('DOMContentLoaded', () => {
         activateTab(tabButtons[0]);
     }
 
-    const savedFontSize = localStorage.getItem('fontSizeMultiplier');
-    if (savedFontSize) {
-        document.documentElement.style.fontSize = (16 * parseFloat(savedFontSize)) + 'px';
+    // =========================================================
+    // 6. ACESSIBILIDADE: MENU GLOBAL NO HEADER
+    // =========================================================
+    const accessibilityToggleBtn = document.getElementById('accessibilityToggleBtn');
+    const accessibilityPanel = document.getElementById('accessibilityPanel');
+    const accessibilityToggleBtnMobile = document.getElementById('accessibilityToggleBtnMobile');
+    const accessibilityPanelMobile = document.getElementById('accessibilityPanelMobile');
+
+    // Toggle do menu de acessibilidade (Desktop)
+    if (accessibilityToggleBtn && accessibilityPanel) {
+        accessibilityToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            accessibilityPanel.classList.toggle('hidden');
+            accessibilityToggleBtn.setAttribute('aria-expanded', !accessibilityPanel.classList.contains('hidden'));
+        });
+
+        // Fechar ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!accessibilityToggleBtn.contains(e.target) && !accessibilityPanel.contains(e.target)) {
+                accessibilityPanel.classList.add('hidden');
+                accessibilityToggleBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
     }
 
+    // Botões de acessibilidade (Desktop)
+    const btnsAccessibilityHeader = document.querySelectorAll('.btn-accessibility-header');
+    const btnContrastHeader = document.querySelector('.btn-contrast-header');
+
+    let fontSizeMultiplier = parseFloat(localStorage.getItem('fontSizeMultiplier') || '1');
+    document.documentElement.style.fontSize = (16 * fontSizeMultiplier) + 'px';
+
+    btnsAccessibilityHeader.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.dataset.action;
+            if (action === 'increase') fontSizeMultiplier = Math.min(1.5, fontSizeMultiplier + 0.1);
+            else if (action === 'decrease') fontSizeMultiplier = Math.max(0.8, fontSizeMultiplier - 0.1);
+            else fontSizeMultiplier = 1;
+            document.documentElement.style.fontSize = (16 * fontSizeMultiplier) + 'px';
+            localStorage.setItem('fontSizeMultiplier', fontSizeMultiplier);
+        });
+    });
+
+    if (btnContrastHeader) {
+        btnContrastHeader.addEventListener('click', function() {
+            document.body.classList.toggle('high-contrast');
+            localStorage.setItem('highContrast', document.body.classList.contains('high-contrast'));
+        });
+    }
+
+    // Botões de acessibilidade (Mobile)
+    const btnsAccessibilityMobile = document.querySelectorAll('.btn-accessibility-mobile');
+    const btnContrastMobile = document.querySelector('.btn-contrast-mobile');
+
+    btnsAccessibilityMobile.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.dataset.action;
+            if (action === 'increase') fontSizeMultiplier = Math.min(1.5, fontSizeMultiplier + 0.1);
+            else if (action === 'decrease') fontSizeMultiplier = Math.max(0.8, fontSizeMultiplier - 0.1);
+            else fontSizeMultiplier = 1;
+            document.documentElement.style.fontSize = (16 * fontSizeMultiplier) + 'px';
+            localStorage.setItem('fontSizeMultiplier', fontSizeMultiplier);
+        });
+    });
+
+    if (btnContrastMobile) {
+        btnContrastMobile.addEventListener('click', function() {
+            document.body.classList.toggle('high-contrast');
+            localStorage.setItem('highContrast', document.body.classList.contains('high-contrast'));
+        });
+    }
+
+    // Restaurar estado salvo
     if (localStorage.getItem('highContrast') === 'true') {
         document.body.classList.add('high-contrast');
     }
