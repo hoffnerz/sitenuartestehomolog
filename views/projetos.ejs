@@ -1,30 +1,42 @@
 <%- include('header.ejs') %>
 
-<section id="projetos" class="bg-white py-24 md:py-40 px-4 animate-on-scroll">
-    <div class="container mx-auto max-w-7xl">
-        <h2 class="text-4xl md:text-5xl font-bold text-[#3B2C5B] text-center mb-16">Nossos Projetos Inovadores</h2>
-        
-        <div class="grid grid-cols-1 gap-16"> <% projetos.forEach((projeto, index) => { %>
-                <% 
-                   // Se o índice for ímpar, ele inverte a ordem no desktop
-                   const isEven = index % 2 === 0; 
-                %>
-                <div class="bg-white card-style p-6 md:p-10 flex flex-col <%= isEven ? 'md:flex-row' : 'md:flex-row-reverse' %> md:items-start items-center gap-8 md:gap-12 shadow-md rounded-3xl transition-all hover:shadow-xl">
-                  
-                    <div class="w-full md:w-72 md:h-72 flex-shrink-0">
-                        <img src="<%= projeto.imagem_url %>" alt="<%= projeto.titulo %>" loading="lazy" class="w-full h-64 md:h-full rounded-2xl shadow-lg object-cover bg-gray-50">
-                    </div>
+<section id="projetos" class="bg-white py-20 md:py-32 px-4 animate-on-scroll">
+    <div class="container mx-auto max-w-6xl">
+        <div class="text-center mb-16">
+            <span class="section-label">O que fazemos</span>
+            <h2 class="section-title">Nossos Projetos Inovadores</h2>
+            <p class="text-gray-500 text-lg max-w-2xl mx-auto mt-4">Conheça as iniciativas que transformam criatividade em impacto real na comunidade do IFMS.</p>
+        </div>
 
-                    <div class="text-center <%= isEven ? 'md:text-left' : 'md:text-right' %> flex-grow">
-                        <span class="text-sm font-bold text-purple-600 uppercase tracking-widest mb-2 block">Projeto 0<%= index + 1 %></span>
-                        <h3 class="text-3xl md:text-4xl font-bold text-[#3B2C5B] mb-6"><%= projeto.titulo %></h3>
-                     
-                        <p class="text-lg text-gray-600 leading-relaxed line-clamp-[10]">
+        <div class="grid grid-cols-1 gap-12">
+            <% projetos.forEach((projeto, index) => { %>
+                <%
+                   const isEven = index % 2 === 0;
+                %>
+                <article class="project-card flex flex-col <%= isEven ? "md:flex-row" : "md:flex-row-reverse" %> items-center gap-8 md:gap-12 animate-on-scroll">
+                    <div class="w-full md:w-2/5 flex-shrink-0">
+                        <div class="project-image-wrapper">
+                            <img src="<%= projeto.imagem_url %>"
+                                 alt="<%= projeto.titulo %>"
+                                 loading="lazy"
+                                 class="w-full h-64 md:h-80 object-cover rounded-2xl shadow-lg">
+                            <div class="project-image-overlay">
+                                <span class="text-white font-bold text-lg"><%= projeto.titulo %></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-3/5 text-center <%= isEven ? "md:text-left" : "md:text-right" %>">
+                        <span class="text-xs font-bold text-[#C46ED8] uppercase tracking-widest mb-3 block">
+                            Projeto 0<%= index + 1 %>
+                        </span>
+                        <h3 class="text-2xl md:text-3xl font-bold text-[#3B2C5B] mb-4 leading-tight">
+                            <%= projeto.titulo %>
+                        </h3>
+                        <p class="text-gray-600 leading-relaxed text-base md:text-lg">
                             <%= projeto.descricao %>
                         </p>
                     </div>
-                    
-                </div>
+                </article>
             <% }) %>
         </div>
     </div>
