@@ -1,179 +1,179 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabPanes = document.querySelectorAll('.tab-pane');
 
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
+document.addEventListener('DOMContentLoaded', () => {
+
+    const headerMenuBtn   = document.getElementById('headerMenuBtn');
+    const sideMenuOverlay = document.getElementById('sideMenuOverlay');
+    const closeMenuBtn    = document.querySelector('.close-menu-btn');
+    const navLinksSide    = document.querySelectorAll('.nav-link-side');
+    const mainHeader      = document.getElementById('mainHeader');
+
+    function openSideMenu() {
+        sideMenuOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        if (headerMenuBtn) headerMenuBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeSideMenu() {
+        sideMenuOverlay.classList.remove('open');
+        document.body.style.overflow = '';
+        if (headerMenuBtn) headerMenuBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    if (headerMenuBtn)   headerMenuBtn.addEventListener('click', openSideMenu);
+    if (closeMenuBtn)    closeMenuBtn.addEventListener('click', closeSideMenu);
+    if (sideMenuOverlay) {
+        sideMenuOverlay.addEventListener('click', (e) => {
+            if (e.target === sideMenuOverlay) closeSideMenu();
+        });
+    }
+    navLinksSide.forEach(link => link.addEventListener('click', closeSideMenu));
+
+    // Fechar menu com tecla Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sideMenuOverlay && sideMenuOverlay.classList.contains('open')) {
+            closeSideMenu();
+        }
+    });
+
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    let lastScrollY = 0;
+    let ticking = false;
+
+    function handleScroll() {
+        const currentScrollY = window.scrollY;
+
+        // Botão flutuante (voltar ao topo / abrir menu)
+        if (menuToggleBtn) {
+            if (currentScrollY > 300) {
+                menuToggleBtn.classList.add('show');
+            } else {
+                menuToggleBtn.classList.remove('show');
+            }
+        }
+
+        // Ocultar header ao rolar para baixo
+        if (mainHeader) {
+            if (currentScrollY > lastScrollY && currentScrollY > mainHeader.offsetHeight) {
+                mainHeader.classList.add('hidden-header');
+            } else if (currentScrollY < lastScrollY) {
+                mainHeader.classList.remove('hidden-header');
+            }
+        }
+
+        lastScrollY = currentScrollY;
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(handleScroll);
+            ticking = true;
+        }
+    }, { passive: true });
+
+    // Botão flutuante: rola ao topo ao clicar
+    if (menuToggleBtn) {
+        menuToggleBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    function setupHeroCarousel(containerSelector) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        const slides         = container.querySelectorAll('.carousel-slide');
+        const prevBtn        = container.querySelector('.carousel-button.prev');
+        const nextBtn        = container.querySelector('.carousel-button.next');
+        const indicatorsWrap = container.querySelector('.carousel-indicators');
+
+        if (!slides.length) return;
+
+        let current = 0;
+        let autoInterval;
+
+        // Recriar indicadores dinamicamente
+        if (indicatorsWrap) {
+            indicatorsWrap.innerHTML = '';
+            slides.forEach((_, i) => {
+                const dot = document.createElement('span');
+                dot.className = 'indicator-dot' + (i === 0 ? ' active' : '');
+                dot.dataset.slideTo = i;
+                dot.addEventListener('click', () => { stopAuto(); goTo(i); startAuto(); });
+                indicatorsWrap.appendChild(dot);
+            });
+        }
+
+        function goTo(index) {
+            slides[current].classList.remove('active');
+            const dots = indicatorsWrap ? indicatorsWrap.querySelectorAll('.indicator-dot') : [];
+            if (dots[current]) dots[current].classList.remove('active');
+
+            current = (index + slides.length) % slides.length;
+            slides[current].classList.add('active');
+            if (dots[current]) dots[current].classList.add('active');
+        }
+
+        function startAuto() { autoInterval = setInterval(() => goTo(current + 1), 5000); }
+        function stopAuto()  { clearInterval(autoInterval); }
+
+        if (prevBtn) prevBtn.addEventListener('click', () => { stopAuto(); goTo(current - 1); startAuto(); });
+        if (nextBtn) nextBtn.addEventListener('click', () => { stopAuto(); goTo(current + 1); startAuto(); });
+
+        goTo(0);
+        startAuto();
+    }
+
+    setupHeroCarousel('#inicio .hero-carousel-container');
+
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            }
+        });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+        scrollObserver.observe(el);
+    });
+
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes   = document.querySelectorAll('.tab-pane');
+
+    if (tabButtons.length > 0) {
+        function activateTab(button) {
             tabButtons.forEach(btn => {
                 btn.classList.remove('active-tab');
-                btn.classList.remove('bg-[#3B2C5B]', 'text-white');
-                btn.classList.add('bg-gray-200', 'text-[#3B2C5B]');
+                btn.setAttribute('aria-selected', 'false');
             });
-
-            button.classList.add('active-tab');
-            button.classList.remove('bg-gray-200', 'text-[#3B2C5B]');
-            button.classList.add('bg-[#3B2C5B]', 'text-white');
-
             tabPanes.forEach(pane => {
                 pane.style.display = 'none';
                 pane.classList.remove('active-pane');
             });
 
-            const targetTab = button.dataset.tab;
-            const activePane = document.getElementById(targetTab);
-            if (activePane) {
-                activePane.style.display = 'block';
-                setTimeout(() => {
-                    activePane.classList.add('active-pane');
-                }, 10);
+            button.classList.add('active-tab');
+            button.setAttribute('aria-selected', 'true');
+
+            const targetId = button.dataset.tab;
+            const target   = document.getElementById(targetId);
+            if (target) {
+                target.style.display = 'block';
+                requestAnimationFrame(() => target.classList.add('active-pane'));
             }
-        });
-    });
-    if (tabButtons.length > 0) {
-        tabButtons[0].click();
+        }
+
+        tabButtons.forEach(btn => btn.addEventListener('click', () => activateTab(btn)));
+        activateTab(tabButtons[0]);
     }
 
-    function setupCarousel(carouselSelector) {
-        const carouselContainer = document.querySelector(carouselSelector);
-        if (!carouselContainer) return;
-
-        const slides = carouselContainer.querySelectorAll('.carousel-slide');
-        const prevButton = carouselContainer.querySelector('.carousel-button.prev');
-        const nextButton = carouselContainer.querySelector('.carousel-button.next');
-        const indicatorsContainer = carouselContainer.querySelector('.carousel-indicators');
-        let currentSlide = 0;
-        let autoSlideInterval;
-        
-        if (indicatorsContainer) {
-            indicatorsContainer.innerHTML = '';
-            slides.forEach((_, index) => {
-                const dot = document.createElement('span');
-                dot.classList.add('indicator-dot');
-                if (index === 0) dot.classList.add('active');
-                dot.dataset.slideTo = index;
-                dot.addEventListener('click', () => {
-                    stopAutoSlide();
-                    showSlide(index);
-                    startAutoSlide();
-                });
-                indicatorsContainer.appendChild(dot);
-            });
-        }
-
-        const indicatorDots = indicatorsContainer ? indicatorsContainer.querySelectorAll('.indicator-dot') : [];
-
-        function showSlide(index) {
-            slides.forEach((slide) => slide.classList.remove('active'));
-            slides[index].classList.add('active');
-
-            indicatorDots.forEach((dot) => dot.classList.remove('active'));
-            if (indicatorDots[index]) indicatorDots[index].classList.add('active');
-        }
-
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % slides.length;
-            showSlide(currentSlide);
-        }
-
-        function prevSlide() {
-            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-            showSlide(currentSlide);
-        }
-
-        function startAutoSlide() {
-            autoSlideInterval = setInterval(nextSlide, 5000);
-        }
-
-        function stopAutoSlide() {
-            clearInterval(autoSlideInterval);
-        }
-
-        if (prevButton) prevButton.addEventListener('click', () => { stopAutoSlide(); prevSlide(); startAutoSlide(); });
-        if (nextButton) nextButton.addEventListener('click', () => { stopAutoSlide(); nextSlide(); startAutoSlide(); });
-
-        showSlide(currentSlide);
-        startAutoSlide();
+    const savedFontSize = localStorage.getItem('fontSizeMultiplier');
+    if (savedFontSize) {
+        document.documentElement.style.fontSize = (16 * parseFloat(savedFontSize)) + 'px';
     }
 
-    setupCarousel('#inicio .carousel-container');
-    setupCarousel('#equipe .carousel-container');
-
-    const menuToggleBtn = document.getElementById("menuToggleBtn");
-    const headerMenuBtn = document.getElementById("headerMenuBtn");
-    const sideMenuOverlay = document.getElementById("sideMenuOverlay");
-    const closeMenuBtn = document.querySelector(".close-menu-btn");
-    const navLinksSide = document.querySelectorAll(".nav-link-side");
-    const mainHeader = document.getElementById("mainHeader");
-    let lastScrollY = 0;
-
-    function openSideMenu() {
-        sideMenuOverlay.classList.add('open');
+    if (localStorage.getItem('highContrast') === 'true') {
+        document.body.classList.add('high-contrast');
     }
 
-    function closeSideMenu() {
-        sideMenuOverlay.classList.remove('open');
-    }
-
-    window.onscroll = function() {
-        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-            menuToggleBtn.classList.add('show');
-        } else {
-            menuToggleBtn.classList.remove('show');
-        }
-
-        if (window.scrollY > lastScrollY && window.scrollY > mainHeader.offsetHeight) {
-            mainHeader.classList.add('hidden-header');
-        } else if (window.scrollY < lastScrollY) {
-            mainHeader.classList.remove('hidden-header');
-        }
-        lastScrollY = window.scrollY;
-    };
-    
-    menuToggleBtn.addEventListener("click", openSideMenu);
-    headerMenuBtn.addEventListener("click", openSideMenu);
-    closeMenuBtn.addEventListener("click", closeSideMenu);
-    navLinksSide.forEach(link => {
-        link.addEventListener("click", closeSideMenu);
-    });
-    sideMenuOverlay.addEventListener("click", function(event) {
-        if (event.target === sideMenuOverlay) {
-            closeSideMenu();
-        }
-    });
-
-    // Lógica para Scroll Reveal (Animação ao rolar)
-    const scrollElements = document.querySelectorAll('.animate-on-scroll');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-            } else {
-                // Opcional: remover a classe quando o elemento sai da tela
-                // entry.target.classList.remove('is-visible');
-            }
-        });
-    }, {
-        threshold: 0.1
-    });
-    scrollElements.forEach(element => {
-        observer.observe(element);
-    });
-
-    const observerMenu = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            const id = entry.target.getAttribute("id");
-            const link = document.querySelector('.side-menu a[href="#' + id + '"]');
-            if (link) {
-                if (entry.isIntersecting) {
-                    link.classList.add("font-bold", "underline");
-                } else {
-                    link.classList.remove("font-bold", "underline");
-                }
-            }
-        });
-    }, { threshold: 0.5 });
-
-    document.querySelectorAll("section[id]").forEach((section) => {
-        observerMenu.observe(section);
-    });
 });
