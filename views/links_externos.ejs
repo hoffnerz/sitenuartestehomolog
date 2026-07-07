@@ -165,27 +165,6 @@
             <% } %>
         </section>
 
-        <!-- ===== ACESSIBILIDADE ===== -->
-        <section class="vox-acessibilidade-section mt-16 animate-on-scroll" aria-labelledby="acessibilidade-titulo">
-            <h2 id="acessibilidade-titulo" class="text-xl font-bold text-white mb-6">Acessibilidade</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <p class="text-purple-200 text-sm font-semibold mb-3 uppercase tracking-wider">Tamanho da Fonte</p>
-                    <div class="flex gap-2">
-                        <button class="btn-acessibilidade" data-action="decrease" aria-label="Diminuir fonte">A&minus;</button>
-                        <button class="btn-acessibilidade" data-action="reset" aria-label="Restaurar fonte">A</button>
-                        <button class="btn-acessibilidade" data-action="increase" aria-label="Aumentar fonte">A+</button>
-                    </div>
-                </div>
-                <div>
-                    <p class="text-purple-200 text-sm font-semibold mb-3 uppercase tracking-wider">Modo de Contraste</p>
-                    <button class="btn-contraste" aria-label="Alternar alto contraste">
-                        Alto Contraste
-                    </button>
-                </div>
-            </div>
-        </section>
-
         <!-- ===== CTA CONTRIBUIÇÃO ===== -->
         <section class="vox-cta-section mt-8 animate-on-scroll" aria-labelledby="cta-titulo">
             <div class="text-center">
@@ -220,31 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Acessibilidade: tamanho de fonte
-    const btnsAcessibilidade = document.querySelectorAll('.btn-acessibilidade');
-    let fontSizeMultiplier = parseFloat(localStorage.getItem('fontSizeMultiplier') || '1');
-    document.documentElement.style.fontSize = (16 * fontSizeMultiplier) + 'px';
 
-    btnsAcessibilidade.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const action = this.dataset.action;
-            if (action === 'increase') fontSizeMultiplier = Math.min(1.5, fontSizeMultiplier + 0.1);
-            else if (action === 'decrease') fontSizeMultiplier = Math.max(0.8, fontSizeMultiplier - 0.1);
-            else fontSizeMultiplier = 1;
-            document.documentElement.style.fontSize = (16 * fontSizeMultiplier) + 'px';
-            localStorage.setItem('fontSizeMultiplier', fontSizeMultiplier);
-        });
-    });
-
-    // Acessibilidade: alto contraste
-    const btnContraste = document.querySelector('.btn-contraste');
-    if (localStorage.getItem('highContrast') === 'true') document.body.classList.add('high-contrast');
-    if (btnContraste) {
-        btnContraste.addEventListener('click', function() {
-            document.body.classList.toggle('high-contrast');
-            localStorage.setItem('highContrast', document.body.classList.contains('high-contrast'));
-        });
-    }
 });
 </script>
 
