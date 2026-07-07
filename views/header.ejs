@@ -4,54 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NuAR - Núcleo de Animação e Roteiro do IFMS</title>
-    <meta name="description" content="Site oficial do NuAR - Núcleo de Animação e Roteiro do IFMS. Conheça nossos projetos, produções e equipe ">
-    <meta name="keywords" content="NuAR, IFMS, Núcleo de Animação e Roteiro, animação, roteiro, projetos, tecnologia, educação, Campo Grande, MS, Heroínas na Ciência, VOX, CTRL+femme, 3DSTORY">
-    <link rel="icon" src="/Imagens/logonuar.png" type="image/png">
-
+    <meta name="description" content="Site oficial do NuAR - Núcleo de Animação e Roteiro do IFMS. Conheça nossos projetos, produções e equipe.">
+    <meta name="keywords" content="NuAR, IFMS, Núcleo de Animação e Roteiro, animação, roteiro, projetos, tecnologia, educação, Campo Grande, MS, VOX, CTRL+femme, 3DSTORY">
+    <link rel="icon" href="/Imagens/logonuar.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="leading-relaxed">
-    <header id="mainHeader" class="bg-[#3B2C5B] text-white py-10 shadow-2xl sticky top-0 z-50 main-header">
-        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between px-4">
-            <div class="flex items-center gap-6">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIqgzSWlM1EQ4CZ8vYqYBVAtYD0yfehFwAfg&s" alt="[Logo do NuAR]" class="h-20 w-auto">
-                <div class="text-5xl md:text-6xl font-bold text-white tracking-wide">
-                    NuAR
-                </div>
-            </div>
-            <div class="text-xl md:text-2xl font-light mt-2 md:mt-0 md:ml-4 opacity-90">
-                Núcleo de Animação e Roteiro do IFMS
-            </div>
-            <div class="flex items-center gap-4">
-                <% if (isAdmin) { %>
-                    <div class="profile-menu">
-                        <img src="<%= userPhoto %>" alt="Foto do Perfil" class="h-16 w-16 rounded-full border-2 border-white object-cover">
-                        <div id="profileDropdown" class="profile-menu-content">
-                            <a href="/admin/logout">Sair</a>
-                        </div>
+<body class="leading-relaxed antialiased">
+
+    <header id="mainHeader" class="nuar-header sticky top-0 z-50">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="flex items-center justify-between h-16 md:h-20">
+
+                <a href="/" class="flex items-center gap-3 group flex-shrink-0" aria-label="Página inicial do NuAR">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIqgzSWlM1EQ4CZ8vYqYBVAtYD0yfehFwAfg&s"
+                         alt="Logo NuAR" class="h-10 w-auto rounded-lg">
+                    <div>
+                        <span class="block text-xl font-black text-white tracking-tight leading-none">NuAR</span>
+                        <span class="block text-xs text-purple-200 font-medium leading-none mt-0.5 hidden sm:block">Núcleo de Animação e Roteiro</span>
                     </div>
-                <% } else { %>
-                    <button id="headerMenuBtn" aria-label="Abrir menu de navegação">
-                        ☰
-                    </button>
-                <% } %>
+                </a>
+
+                <nav class="hidden lg:flex items-center gap-1" aria-label="Navegação principal">
+                    <a href="/" class="nav-link-desktop">Início</a>
+                    <a href="/projetos" class="nav-link-desktop">Projetos</a>
+                    <a href="/noticias" class="nav-link-desktop">Notícias</a>
+                    <a href="/producoes" class="nav-link-desktop">Produções</a>
+                    <a href="/artigos" class="nav-link-desktop">Artigos</a>
+                    <a href="/feiras" class="nav-link-desktop">Feiras</a>
+                    <a href="/editais" class="nav-link-desktop">Editais</a>
+                    <a href="/equipe" class="nav-link-desktop">Equipe</a>
+                    <a href="/links" class="nav-link-desktop nav-link-vox">
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#C46ED8] animate-pulse"></span>
+                            Edições VOX
+                        </span>
+                    </a>
+                </nav>
+
+                <div class="flex items-center gap-3">
+                    <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                        <div class="profile-menu">
+                            <button class="flex items-center gap-2 text-white hover:text-purple-200 transition-colors" aria-label="Menu do administrador">
+                                <img src="<%= userPhoto %>" alt="Foto do Perfil" class="h-9 w-9 rounded-full border-2 border-purple-300 object-cover">
+                                <span class="hidden md:block text-sm font-medium">Admin</span>
+                            </button>
+                            <div id="profileDropdown" class="profile-menu-content">
+                                <a href="/admin/logout">Sair</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <button id="headerMenuBtn"
+                                class="lg:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-white/10 transition-colors gap-1.5 p-2"
+                                aria-label="Abrir menu de navegação"
+                                aria-expanded="false">
+                            <span class="hamburger-line"></span>
+                            <span class="hamburger-line"></span>
+                            <span class="hamburger-line"></span>
+                        </button>
+                    <% } %>
+                </div>
+
             </div>
         </div>
     </header>
 
-    <div id="sideMenuOverlay" class="menu-overlay">
-        <div class="side-menu">
-            <button class="close-menu-btn" aria-label="Fechar menu">X</button>
-            <a href="/" class="nav-link-side" data-section="inicio">Início</a>
-            <a href="/projetos" class="nav-link-side">Projetos</a>
-            <a href="/noticias" class="nav-link-side">Notícias</a>
-            <a href="/producoes" class="nav-link-side">Produções</a>
-            <a href="/artigos" class="nav-link-side">Artigos</a>
-            <a href="/feiras" class="nav-link-side">Feiras</a>
-            <a href="/editais" class="nav-link-side">Editais</a>
-            <a href="/equipe" class="nav-link-side">Equipe</a>     
-            <a href="/links" class="nav-link-side">Links externos</a>        
+    <div id="sideMenuOverlay" class="menu-overlay" role="dialog" aria-modal="true" aria-label="Menu de navegação">
+        <div class="side-menu" id="sideMenuPanel">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-3">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIqgzSWlM1EQ4CZ8vYqYBVAtYD0yfehFwAfg&s"
+                         alt="Logo NuAR" class="h-8 w-auto rounded">
+                    <span class="text-white font-bold text-lg">NuAR</span>
+                </div>
+                <button class="close-menu-btn" aria-label="Fechar menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <nav class="flex flex-col gap-1" aria-label="Navegação mobile">
+                <a href="/" class="nav-link-side">Início</a>
+                <a href="/projetos" class="nav-link-side">Projetos</a>
+                <a href="/noticias" class="nav-link-side">Notícias</a>
+                <a href="/producoes" class="nav-link-side">Produções</a>
+                <a href="/artigos" class="nav-link-side">Artigos</a>
+                <a href="/feiras" class="nav-link-side">Feiras</a>
+                <a href="/editais" class="nav-link-side">Editais</a>
+                <a href="/equipe" class="nav-link-side">Equipe</a>
+                <a href="/links" class="nav-link-side nav-link-side-vox">
+                    Edições VOX
+                    <span class="ml-auto text-xs bg-[#C46ED8] text-white px-2 py-0.5 rounded-full font-semibold">Jornal</span>
+                </a>
+            </nav>
         </div>
     </div>
+
