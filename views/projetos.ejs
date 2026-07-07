@@ -14,12 +14,12 @@
                    const isEven = index % 2 === 0;
                 %>
                 <article class="project-card flex flex-col <%= isEven ? "md:flex-row" : "md:flex-row-reverse" %> items-center gap-8 md:gap-12 animate-on-scroll">
-                    <div class="w-full md:w-2/5 flex-shrink-0">
+                    <div class="w-full md:w-2/5 flex-shrink-0 flex items-center justify-center">
                         <div class="project-image-wrapper">
                             <img src="<%= projeto.imagem_url %>"
                                  alt="<%= projeto.titulo %>"
                                  loading="lazy"
-                                 class="w-full h-64 md:h-80 object-cover rounded-2xl shadow-lg">
+                                 class="project-image-fixed rounded-2xl shadow-lg">
                             <div class="project-image-overlay">
                                 <span class="text-white font-bold text-lg"><%= projeto.titulo %></span>
                             </div>
@@ -32,7 +32,7 @@
                         <h3 class="text-2xl md:text-3xl font-bold text-[#3B2C5B] mb-4 leading-tight">
                             <%= projeto.titulo %>
                         </h3>
-                        <p class="text-gray-600 leading-relaxed text-base md:text-lg">
+                        <p class="text-gray-600 leading-relaxed text-base md:text-lg text-justify">
                             <%= projeto.descricao %>
                         </p>
                     </div>
