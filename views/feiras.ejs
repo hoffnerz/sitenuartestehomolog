@@ -1,26 +1,47 @@
 <%- include('header.ejs') %>
 
-<section id="feiras-e-mostras" class="bg-[#f0f0f0] py-24 md:py-40 px-4 animate-on-scroll">
-    <div class="container mx-auto max-w-7xl">
-        <h2 class="text-4xl md:text-5xl font-bold text-[#3B2C5B] text-center mb-16">Feiras e Mostras Científicas</h2>
-        <ul class="list-none p-0 m-0 text-gray-700 space-y-6 max-w-4xl mx-auto">
+<section id="feiras-e-mostras" class="bg-white py-20 md:py-32 px-4 animate-on-scroll">
+    <div class="container mx-auto max-w-5xl">
+        <div class="text-center mb-16">
+            <span class="section-label">Presença Nacional</span>
+            <h2 class="section-title">Feiras e Mostras Científicas</h2>
+            <p class="text-gray-500 text-lg max-w-2xl mx-auto mt-4">Eventos em que o NuAR apresentou seus projetos e conquistou reconhecimento.</p>
+        </div>
+
+        <div class="space-y-5">
             <% feiras.forEach(feira => { %>
-            <li class="bg-white card-style p-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between">
-                    <h2 class="font-bold text-[#3B2C5B] text-xl mb-2 md:mb-0"><%= feira.titulo %></h2>
-
-                    <span class="text-sm font-semibold text-gray-500 mt-2 md:mt-0"><%= feira.ano %></span>
+            <article class="feira-card group">
+                <div class="flex flex-col md:flex-row md:items-start gap-5">
+                    <div class="flex-shrink-0">
+                        <div class="feira-year-badge">
+                            <%= feira.ano %>
+                        </div>
+                    </div>
+                    <div class="flex-grow">
+                        <h2 class="text-xl font-bold text-[#3B2C5B] mb-2 leading-tight group-hover:text-[#C46ED8] transition-colors">
+                            <%= feira.titulo %>
+                        </h2>
+                        <% if (feira.descricao) { %>
+                            <p class="text-gray-600 leading-relaxed mb-4"><%= feira.descricao %></p>
+                        <% } %>
+                        <% if (feira.link_externo) { %>
+                        <a href="<%= feira.link_externo %>" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 text-sm font-semibold text-[#C46ED8] hover:text-[#8C40B8] transition-colors">
+                            Saiba mais
+                            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                        </a>
+                        <% } %>
+                    </div>
                 </div>
-                <p class="text-base text-gray-600 mt-4"><%= feira.descricao %></p>
-
-                <% if (feira.link_externo) { %>
-                <div class="mt-4">
-                    <a href="<%= feira.link_externo %>" target="_blank" class="text-blue-500 underline text-sm">Saiba mais</a>
-                </div>
-                <% } %>
-            </li>
+            </article>
             <% }) %>
-        </ul>
+        </div>
+
+        <% if (!feiras || feiras.length === 0) { %>
+            <div class="text-center py-20">
+                <p class="text-gray-400 text-lg">Nenhuma feira cadastrada ainda.</p>
+            </div>
+        <% } %>
     </div>
 </section>
 
