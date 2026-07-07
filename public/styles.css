@@ -1,3 +1,4 @@
+
 :root {
     --color-primary:       #3B2C5B;
     --color-primary-dark:  #2A1F42;
@@ -732,6 +733,23 @@ body {
     position: relative;
     overflow: hidden;
     border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+}
+.project-image-fixed {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    transition: transform var(--transition-base);
+}
+@media (min-width: 768px) {
+    .project-image-fixed {
+        max-height: 400px;
+    }
 }
 .project-image-overlay {
     position: absolute;
@@ -774,6 +792,93 @@ body {
     justify-content: center;
     color: white;
     flex-shrink: 0;
+}
+
+/* ===== MENU DE ACESSIBILIDADE GLOBAL ===== */
+.accessibility-menu {
+    position: relative;
+}
+.accessibility-panel {
+    animation: slideDown var(--transition-base) ease-out;
+}
+.accessibility-panel.hidden {
+    display: none;
+}
+.btn-accessibility-header {
+    background-color: #f0f0f0;
+    color: var(--color-primary);
+    border: 1px solid #e0e0e0;
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-width: 2.5rem;
+    text-align: center;
+}
+.btn-accessibility-header:hover {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+.btn-contrast-header {
+    background-color: #f0f0f0;
+    color: var(--color-primary);
+    border: 1px solid #e0e0e0;
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-contrast-header:hover {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+.btn-accessibility-mobile {
+    background-color: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-width: 2.5rem;
+    text-align: center;
+}
+.btn-accessibility-mobile:hover {
+    background-color: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.4);
+}
+.btn-contrast-mobile {
+    background-color: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-contrast-mobile:hover {
+    background-color: rgba(255,255,255,0.25);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ===== VOX PORTAL ===== */
@@ -1184,42 +1289,6 @@ body {
 }
 .vox-link-card:hover .vox-link-action {
     color: var(--color-accent-dark);
-}
-
-/* Acessibilidade VOX */
-.vox-acessibilidade-section {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
-    border-radius: var(--radius-2xl);
-    padding: 2rem;
-}
-.btn-acessibilidade {
-    background-color: rgba(255,255,255,0.15);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.25);
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-md);
-    font-size: 0.875rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-.btn-acessibilidade:hover {
-    background-color: rgba(255,255,255,0.25);
-    border-color: rgba(255,255,255,0.4);
-}
-.btn-contraste {
-    background-color: rgba(255,255,255,0.15);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.25);
-    padding: 0.5rem 1.5rem;
-    border-radius: var(--radius-md);
-    font-size: 0.875rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-.btn-contraste:hover {
-    background-color: rgba(255,255,255,0.25);
 }
 
 /* CTA VOX */
