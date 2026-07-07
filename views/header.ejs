@@ -43,7 +43,58 @@
                     </a>
                 </nav>
 
-                <div class="flex items-center gap-3">
+                <!-- Menu de Acessibilidade Global -->
+                <div class="accessibility-menu hidden lg:flex items-center">
+                    <button id="accessibilityToggleBtn" 
+                            class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors" 
+                            aria-label="Abrir menu de acessibilidade" 
+                            aria-expanded="false"
+                            aria-controls="accessibilityPanel">
+                        <svg class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                    <div id="accessibilityPanel" 
+                         class="accessibility-panel hidden absolute top-full right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-4 min-w-max z-50" 
+                         role="dialog" 
+                         aria-modal="true" 
+                         aria-labelledby="accessibilityTitle">
+                        <h3 id="accessibilityTitle" class="text-sm font-bold text-gray-900 mb-3">Acessibilidade</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">Tamanho da Fonte</p>
+                                <div class="flex gap-1.5">
+                                    <button class="btn-accessibility-header" data-action="decrease" aria-label="Diminuir fonte">A−</button>
+                                    <button class="btn-accessibility-header" data-action="reset" aria-label="Restaurar fonte">A</button>
+                                    <button class="btn-accessibility-header" data-action="increase" aria-label="Aumentar fonte">A+</button>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">Contraste</p>
+                                <button class="btn-contrast-header w-full" aria-label="Alternar alto contraste">
+                                    Alto Contraste
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <!-- Menu de Acessibilidade Mobile -->
+                    <div class="accessibility-menu lg:hidden">
+                        <button id="accessibilityToggleBtnMobile" 
+                                class="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-white/10 transition-colors" 
+                                aria-label="Abrir menu de acessibilidade" 
+                                aria-expanded="false"
+                                aria-controls="accessibilityPanelMobile">
+                            <svg class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+
                     <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
                         <div class="profile-menu">
                             <button class="flex items-center gap-2 text-white hover:text-purple-200 transition-colors" aria-label="Menu do administrador">
@@ -84,7 +135,7 @@
                     </svg>
                 </button>
             </div>
-            <nav class="flex flex-col gap-1" aria-label="Navegação mobile">
+            <nav class="flex flex-col gap-1 mb-6" aria-label="Navegação mobile">
                 <a href="/" class="nav-link-side">Início</a>
                 <a href="/projetos" class="nav-link-side">Projetos</a>
                 <a href="/noticias" class="nav-link-side">Notícias</a>
@@ -98,6 +149,27 @@
                     <span class="ml-auto text-xs bg-[#C46ED8] text-white px-2 py-0.5 rounded-full font-semibold">Jornal</span>
                 </a>
             </nav>
+
+            <!-- Acessibilidade Mobile -->
+            <div id="accessibilityPanelMobile" class="border-t border-white/10 pt-4">
+                <p class="text-purple-200 text-xs font-semibold mb-3 uppercase tracking-wider">Acessibilidade</p>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-purple-200 text-xs font-semibold mb-2 uppercase tracking-wider">Tamanho da Fonte</p>
+                        <div class="flex gap-1.5">
+                            <button class="btn-accessibility-mobile" data-action="decrease" aria-label="Diminuir fonte">A−</button>
+                            <button class="btn-accessibility-mobile" data-action="reset" aria-label="Restaurar fonte">A</button>
+                            <button class="btn-accessibility-mobile" data-action="increase" aria-label="Aumentar fonte">A+</button>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-purple-200 text-xs font-semibold mb-2 uppercase tracking-wider">Contraste</p>
+                        <button class="btn-contrast-mobile w-full" aria-label="Alternar alto contraste">
+                            Alto Contraste
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
