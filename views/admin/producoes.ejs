@@ -1,61 +1,166 @@
 <%- include('../header.ejs') %>
+<link rel="stylesheet" href="/admin.css">
 
-<section class="bg-white py-24 md:py-40 px-4 animate-on-scroll min-h-screen">
-    <div class="container mx-auto max-w-7xl flex flex-col md:flex-row gap-10">
+<section class="admin-page animate-on-scroll">
+    <div class="admin-shell">
+
+        <div class="admin-topbar">
+            <span class="admin-topbar__title">Painel NuAR</span>
+            <button type="button" id="adminSidebarOpenBtn" class="admin-topbar__toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                Menu
+            </button>
+        </div>
+
         <%- include('../_admin_sidebar.ejs') %>
-        <main class="w-full md:w-3/4 bg-[#f0f0f0] p-10 rounded-3xl shadow-lg">
-            <h2 class="text-4xl font-bold text-[#3B2C5B] mb-8">Painel de Administração - Produções</h2>
 
-            <% if (typeof sucesso !== 'undefined') { %>
-                <div class="bg-green-200 text-green-800 p-4 rounded-md mb-6">
-                    <p>Item adicionado/deletado/alterado com sucesso!</p>
+        <main class="admin-main">
+            <div class="admin-card">
+                <div class="admin-page-header">
+                    <div>
+                        <span class="admin-page-header__eyebrow">Painel de administração</span>
+                        <h2 class="admin-page-header__title">Produções</h2>
+                        <p class="admin-page-header__count"><%= producoes.length %> produção<%= producoes.length === 1 ? '' : 'ões' %> cadastrada<%= producoes.length === 1 ? '' : 's' %></p>
+                    </div>
+                    <button id="btn-adicionar-producao" class="admin-btn admin-btn--primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                        Adicionar Produção
+                    </button>
                 </div>
-            <% } %>
 
-            <div id="producoes-form" class="space-y-6">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-3xl font-bold text-[#3B2C5B]">Produções</h3>
-                    <button id="btn-adicionar-producao" class="bg-[#C46ED8] text-white px-4 py-2 rounded hover:bg-[#8C40B8] transition-colors">Adicionar Produção</button>
-                </div>
-                <div id="form-producoes-container" class="hidden mt-8 p-6 bg-white rounded-lg shadow">
-                    <h4 id="form-title-producao" class="text-2xl font-bold text-[#3B2C5B] mb-4">Adicionar Nova Produção</h4>
-                    <form id="form-producao" action="/admin/adicionar-producao" method="POST" class="space-y-6">
+                <% if (typeof sucesso !== 'undefined' && sucesso) {
+                    let msg = 'Alteração realizada com sucesso!';
+                    if (sucesso === 'true') msg = 'Produção adicionada com sucesso!';
+                    else if (sucesso === 'alterado') msg = 'Produção atualizada com sucesso!';
+                    else if (sucesso === 'deletado') msg = 'Produção removida com sucesso!';
+                %>
+                    <div class="admin-alert admin-alert--success">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        <span><%= msg %></span>
+                    </div>
+                <% } %>
+
+                <div id="form-producoes-container" class="admin-form-panel hidden">
+                    <h4 id="form-title-producao" class="admin-form-panel__title">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                        Adicionar Nova Produção
+                    </h4>
+                    <form id="form-producao" action="/admin/adicionar-producao" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <input type="hidden" name="id" id="producao-id-input">
-                        <input type="text" name="titulo" id="producao-titulo-input" placeholder="Título" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
-                        <textarea name="descricao" id="producao-descricao-input" placeholder="Descrição" required rows="4" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors"></textarea>
-                        <input type="text" name="link_externo" id="producao-link_externo-input" placeholder="Link Externo" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
-                        <input type="date" name="data_publicacao" id="producao-data_publicacao-input" placeholder="Data de Publicação" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
-                        <select name="projeto_id" id="producao-projeto_id-input" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
-                            <option value="">-- Selecione um Projeto --</option>
-                            <% projetos.forEach(item => { %>
-                                <option value="<%= item.id %>"><%= item.titulo %></option>
-                            <% }) %>
-                        </select>
-                        <button type="submit" class="btn-roxo">Salvar</button>
+                        <div class="admin-form-grid">
+                            <div class="admin-field admin-field--full">
+                                <label for="producao-titulo-input">Título</label>
+                                <input type="text" name="titulo" id="producao-titulo-input" placeholder="Título da produção" required class="admin-input">
+                            </div>
+                            <div class="admin-field admin-field--full">
+                                <label for="producao-descricao-input">Descrição</label>
+                                <textarea name="descricao" id="producao-descricao-input" placeholder="Descrição da produção" required rows="4" class="admin-textarea"></textarea>
+                            </div>
+                            <div class="admin-field">
+                                <label for="producao-link_externo-input">Link externo</label>
+                                <input type="text" name="link_externo" id="producao-link_externo-input" placeholder="https://..." class="admin-input">
+                            </div>
+                            <div class="admin-field">
+                                <label for="producao-data_publicacao-input">Data de publicação</label>
+                                <input type="date" name="data_publicacao" id="producao-data_publicacao-input" required class="admin-input">
+                            </div>
+                            <div class="admin-field admin-field--full">
+                                <label for="producao-projeto_id-input">Projeto vinculado</label>
+                                <select name="projeto_id" id="producao-projeto_id-input" class="admin-select">
+                                    <option value="">-- Selecione um Projeto --</option>
+                                    <% projetos.forEach(item => { %>
+                                        <option value="<%= item.id %>"><%= item.titulo %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="admin-form-actions">
+                            <button type="submit" class="admin-btn admin-btn--primary">Salvar</button>
+                        </div>
                     </form>
                 </div>
-                <div class="mt-8">
-                    <h4 class="text-2xl font-bold text-[#3B2C5B] mb-4">Producoes Existentes</h4>
-                    <ul class="space-y-4">
+
+                <div class="admin-section-heading">
+                    <h4 class="admin-section-heading__title">Produções existentes</h4>
+                </div>
+
+                <% if (producoes.length > 0) { %>
+                    <div class="admin-search">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                        <input type="text" id="producao-search-input" placeholder="Buscar por título ou descrição...">
+                    </div>
+                <% } %>
+
+                <% if (producoes.length === 0) { %>
+                    <div class="admin-empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 6a2 2 0 012-2h12a2 2 0 012 2M4 6v12a2 2 0 002 2h12a2 2 0 002-2V6"/>
+                        </svg>
+                        <p>Nenhuma produção cadastrada ainda.</p>
+                    </div>
+                <% } else { %>
+                    <ul class="admin-item-list">
                         <% producoes.forEach(item => { %>
-                        <li class="bg-white p-4 rounded-lg shadow flex items-center justify-between">
-                            <div><h5 class="font-bold text-[#3B2C5B]"><%= item.titulo %></h5></div>
-                            <div class="flex items-center gap-2">
-                                <button type="button" onclick='preencherFormProducao(<%= JSON.stringify(item) %>)' class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Alterar</button>
-                                <form action="/admin/deletar-producao/<%= item.id %>" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este item?');">
-                                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">Deletar</button>
+                        <li class="admin-item-card" data-search="<%= item.titulo %> <%= item.descricao %>">
+                            <div class="admin-item-card__main">
+                                <div class="admin-item-card__body">
+                                    <h5 class="admin-item-card__title"><%= item.titulo %></h5>
+                                    <div class="admin-item-card__meta">
+                                        <% if (item.data_publicacao) { %>
+                                            <span class="admin-badge"><%= new Date(item.data_publicacao).toLocaleDateString('pt-BR') %></span>
+                                        <% } %>
+                                        <% if (item.link_externo) { %>
+                                            <a href="<%= item.link_externo %>" target="_blank" rel="noopener">Ver link externo →</a>
+                                        <% } %>
+                                    </div>
+                                    <% if (item.descricao) { %>
+                                        <p class="admin-item-card__desc"><%= item.descricao %></p>
+                                    <% } %>
+                                    <% if (item.modificado_em) { %>
+                                        <span class="admin-item-card__updated">Atualizado em <%= new Date(item.modificado_em).toLocaleDateString('pt-BR') %><% if (item.modificado_por) { %> por <%= item.modificado_por %><% } %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="admin-item-card__actions">
+                                <button type="button" onclick='preencherFormProducao(<%- JSON.stringify(item) %>)' class="admin-btn admin-btn--edit admin-btn--sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+                                    Alterar
+                                </button>
+                                <form action="/admin/deletar-producao/<%= item.id %>" method="POST" data-confirm="Tem certeza que deseja deletar a produção &quot;<%= item.titulo %>&quot;?">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <button type="submit" class="admin-btn admin-btn--danger admin-btn--sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                                        Deletar
+                                    </button>
                                 </form>
                             </div>
                         </li>
                         <% }) %>
                     </ul>
-                </div>
+                    <p id="producao-search-no-results" class="admin-search__no-results">Nenhuma produção encontrada para essa busca.</p>
+                <% } %>
             </div>
         </main>
     </div>
 </section>
 
+<script src="/admin.js"></script>
 <script>
+    window.setupListSearch({
+        input: 'producao-search-input',
+        cardSelector: '.admin-item-list .admin-item-card',
+        noResults: 'producao-search-no-results'
+    });
+
     function preencherFormProducao(item) {
         document.getElementById('form-producoes-container').classList.remove('hidden');
         document.getElementById('form-title-producao').innerText = 'Alterar Produção';
@@ -66,6 +171,7 @@
         document.getElementById('producao-link_externo-input').value = item.link_externo;
         document.getElementById('producao-data_publicacao-input').value = item.data_publicacao ? new Date(item.data_publicacao).toISOString().split('T')[0] : '';
         document.getElementById('producao-projeto_id-input').value = item.projeto_id;
+        document.getElementById('form-producoes-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     document.getElementById('btn-adicionar-producao').addEventListener('click', function() {
         document.getElementById('form-producoes-container').classList.remove('hidden');

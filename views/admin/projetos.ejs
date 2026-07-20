@@ -1,54 +1,187 @@
 <%- include('../header.ejs') %>
+<link rel="stylesheet" href="/admin.css">
 
-<section class="bg-white py-24 md:py-40 px-4 animate-on-scroll min-h-screen">
-    <div class="container mx-auto max-w-7xl flex flex-col md:flex-row gap-10">
+<section class="admin-page animate-on-scroll">
+    <div class="admin-shell">
+
+        <div class="admin-topbar">
+            <span class="admin-topbar__title">Painel NuAR</span>
+            <button type="button" id="adminSidebarOpenBtn" class="admin-topbar__toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                Menu
+            </button>
+        </div>
+
         <%- include('../_admin_sidebar.ejs') %>
-        <main class="w-full md:w-3/4 bg-[#f0f0f0] p-10 rounded-3xl shadow-lg">
-            <h2 class="text-4xl font-bold text-[#3B2C5B] mb-8">Painel de Administração - Projetos</h2>
 
-            <% if (typeof sucesso !== 'undefined') { %>
-                <div class="bg-green-200 text-green-800 p-4 rounded-md mb-6">
-                    <p>Item adicionado/deletado/alterado com sucesso!</p>
+        <main class="admin-main">
+            <div class="admin-card">
+                <div class="admin-page-header">
+                    <div>
+                        <span class="admin-page-header__eyebrow">Painel de administração</span>
+                        <h2 class="admin-page-header__title">Projetos</h2>
+                        <p class="admin-page-header__count"><%= projetos.length %> projeto<%= projetos.length === 1 ? '' : 's' %> cadastrado<%= projetos.length === 1 ? '' : 's' %></p>
+                    </div>
+                    <button id="btn-adicionar-projeto" class="admin-btn admin-btn--primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                        Adicionar Projeto
+                    </button>
                 </div>
-            <% } %>
 
-            <div id="projetos-form" class="space-y-6">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-3xl font-bold text-[#3B2C5B]">Projetos</h3>
-                    <button id="btn-adicionar-projeto" class="bg-[#C46ED8] text-white px-4 py-2 rounded hover:bg-[#8C40B8] transition-colors">Adicionar Projeto</button>
-                </div>
-                <div id="form-projetos-container" class="hidden mt-8 p-6 bg-white rounded-lg shadow">
-                    <h4 id="form-title-projeto" class="text-2xl font-bold text-[#3B2C5B] mb-4">Adicionar Novo Projeto</h4>
-                    <form id="form-projeto" action="/admin/adicionar-projeto" method="POST" class="space-y-6">
+                <% if (typeof sucesso !== 'undefined' && sucesso) {
+                    let msg = 'Alteração realizada com sucesso!';
+                    if (sucesso === 'true') msg = 'Projeto adicionado com sucesso!';
+                    else if (sucesso === 'alterado') msg = 'Projeto atualizado com sucesso!';
+                    else if (sucesso === 'deletado') msg = 'Projeto removido com sucesso!';
+                %>
+                    <div class="admin-alert admin-alert--success">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                        </svg>
+                        <span><%= msg %></span>
+                    </div>
+                <% } %>
+
+                <% if (typeof erro_upload !== 'undefined' && erro_upload) { %>
+                    <div class="admin-alert admin-alert--error">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                        </svg>
+                        <span>Não foi possível enviar a imagem. Verifique se o arquivo é JPG, PNG, WEBP ou GIF e se tem até 5MB.</span>
+                    </div>
+                <% } %>
+
+                <div id="form-projetos-container" class="admin-form-panel hidden">
+                    <h4 id="form-title-projeto" class="admin-form-panel__title">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                        Adicionar Novo Projeto
+                    </h4>
+                    <form id="form-projeto" action="/admin/adicionar-projeto" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <input type="hidden" name="id" id="projeto-id-input">
-                        <input type="text" name="titulo" id="projeto-titulo-input" placeholder="Título" required class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
-                        <textarea name="descricao" id="projeto-descricao-input" placeholder="Descrição" required rows="4" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors"></textarea>
-                        <input type="text" name="imagem_url" id="projeto-imagem_url-input" placeholder="URL da Imagem" class="w-full px-4 py-3 rounded-md border-2 border-gray-300 focus:outline-none focus:border-[#C46ED8] transition-colors">
-                        <button type="submit" class="btn-roxo">Salvar</button>
+                        <div class="admin-form-grid">
+                            <div class="admin-field admin-field--full">
+                                <label for="projeto-titulo-input">Título</label>
+                                <input type="text" name="titulo" id="projeto-titulo-input" placeholder="Título do projeto" required class="admin-input">
+                            </div>
+                            <div class="admin-field admin-field--full">
+                                <label for="projeto-descricao-input">Descrição</label>
+                                <textarea name="descricao" id="projeto-descricao-input" placeholder="Descrição do projeto" required rows="4" class="admin-textarea"></textarea>
+                            </div>
+                            <div class="admin-field admin-field--full">
+                                <label>Imagem do projeto</label>
+                                <div class="admin-upload">
+                                    <div class="admin-upload__row">
+                                        <img id="projeto-imagem-preview" class="admin-upload__preview admin-upload__preview--empty" style="display:none;" alt="Pré-visualização">
+                                        <div id="projeto-imagem-preview-wrap" class="admin-upload__preview admin-upload__preview--empty" style="display:flex;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M18 20.25H6a2.25 2.25 0 01-2.25-2.25V6A2.25 2.25 0 016 3.75h12A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25z"/></svg>
+                                        </div>
+                                        <div id="projeto-imagem-dropzone" class="admin-upload__dropzone">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                                            <span><strong>Clique para enviar</strong> ou arraste uma imagem aqui</span>
+                                        </div>
+                                    </div>
+                                    <span id="projeto-imagem-filename" class="admin-upload__filename"></span>
+                                    <input type="file" name="imagem_arquivo" id="projeto-imagem-arquivo" accept="image/*" class="hidden">
+                                    <button type="button" id="projeto-imagem-toggle-url" class="admin-upload__toggle-url">Ou usar uma URL de imagem já existente</button>
+                                    <div id="projeto-imagem-url-wrap" class="admin-upload__url-field">
+                                        <input type="text" name="imagem_url" id="projeto-imagem_url-input" placeholder="https://..." class="admin-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="admin-form-actions">
+                            <button type="submit" class="admin-btn admin-btn--primary">Salvar</button>
+                        </div>
                     </form>
                 </div>
-                <div class="mt-8">
-                    <h4 class="text-2xl font-bold text-[#3B2C5B] mb-4">Projetos Existentes</h4>
-                    <ul class="space-y-4">
+
+                <div class="admin-section-heading">
+                    <h4 class="admin-section-heading__title">Projetos existentes</h4>
+                </div>
+
+                <% if (projetos.length > 0) { %>
+                    <div class="admin-search">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                        <input type="text" id="projeto-search-input" placeholder="Buscar por título ou descrição...">
+                    </div>
+                <% } %>
+
+                <% if (projetos.length === 0) { %>
+                    <div class="admin-empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+                        </svg>
+                        <p>Nenhum projeto cadastrado ainda.</p>
+                    </div>
+                <% } else { %>
+                    <ul class="admin-item-list">
                         <% projetos.forEach(item => { %>
-                        <li class="bg-white p-4 rounded-lg shadow flex items-center justify-between">
-                            <div><h5 class="font-bold text-[#3B2C5B]"><%= item.titulo %></h5></div>
-                            <div class="flex items-center gap-2">
-                                <button type="button" onclick='preencherFormProjeto(<%= JSON.stringify(item) %>)' class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Alterar</button>
-                                <form action="/admin/deletar-projeto/<%= item.id %>" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este item?');">
-                                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">Deletar</button>
+                        <li class="admin-item-card" data-search="<%= item.titulo %> <%= item.descricao %>">
+                            <div class="admin-item-card__main">
+                                <% if (item.imagem_url) { %>
+                                    <img src="<%= item.imagem_url %>" alt="" class="admin-item-card__avatar">
+                                <% } else { %>
+                                    <div class="admin-item-card__avatar admin-item-card__avatar--fallback"><%= item.titulo ? item.titulo.charAt(0).toUpperCase() : '?' %></div>
+                                <% } %>
+                                <div class="admin-item-card__body">
+                                    <h5 class="admin-item-card__title"><%= item.titulo %></h5>
+                                    <% if (item.descricao) { %>
+                                        <p class="admin-item-card__desc"><%= item.descricao %></p>
+                                    <% } %>
+                                    <% if (item.modificado_em) { %>
+                                        <span class="admin-item-card__updated">Atualizado em <%= new Date(item.modificado_em).toLocaleDateString('pt-BR') %><% if (item.modificado_por) { %> por <%= item.modificado_por %><% } %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="admin-item-card__actions">
+                                <button type="button" onclick='preencherFormProjeto(<%- JSON.stringify(item) %>)' class="admin-btn admin-btn--edit admin-btn--sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+                                    Alterar
+                                </button>
+                                <form action="/admin/deletar-projeto/<%= item.id %>" method="POST" data-confirm="Tem certeza que deseja deletar o projeto &quot;<%= item.titulo %>&quot;?">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <button type="submit" class="admin-btn admin-btn--danger admin-btn--sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                                        Deletar
+                                    </button>
                                 </form>
                             </div>
                         </li>
                         <% }) %>
                     </ul>
-                </div>
+                    <p id="projeto-search-no-results" class="admin-search__no-results">Nenhum projeto encontrado para essa busca.</p>
+                <% } %>
             </div>
         </main>
     </div>
 </section>
 
+<script src="/admin.js"></script>
 <script>
+    const imagemProjetoWidget = window.setupImageUpload({
+        dropzone: 'projeto-imagem-dropzone',
+        fileInput: 'projeto-imagem-arquivo',
+        preview: 'projeto-imagem-preview',
+        previewWrap: 'projeto-imagem-preview-wrap',
+        filename: 'projeto-imagem-filename',
+        urlFieldWrap: 'projeto-imagem-url-wrap',
+        urlInput: 'projeto-imagem_url-input',
+        toggleUrlBtn: 'projeto-imagem-toggle-url'
+    });
+
+    window.setupListSearch({
+        input: 'projeto-search-input',
+        cardSelector: '.admin-item-list .admin-item-card',
+        noResults: 'projeto-search-no-results'
+    });
+
     function preencherFormProjeto(item) {
         document.getElementById('form-projetos-container').classList.remove('hidden');
         document.getElementById('form-title-projeto').innerText = 'Alterar Projeto';
@@ -56,13 +189,15 @@
         document.getElementById('projeto-id-input').value = item.id;
         document.getElementById('projeto-titulo-input').value = item.titulo;
         document.getElementById('projeto-descricao-input').value = item.descricao;
-        document.getElementById('projeto-imagem_url-input').value = item.imagem_url;
+        if (imagemProjetoWidget) imagemProjetoWidget.reset(item.imagem_url);
+        document.getElementById('form-projetos-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     document.getElementById('btn-adicionar-projeto').addEventListener('click', function() {
         document.getElementById('form-projetos-container').classList.remove('hidden');
         document.getElementById('form-title-projeto').innerText = 'Adicionar Novo Projeto';
         document.getElementById('form-projeto').action = '/admin/adicionar-projeto';
         document.getElementById('form-projeto').reset();
+        if (imagemProjetoWidget) imagemProjetoWidget.reset('');
     });
 </script>
 <%- include('../footer.ejs') %>

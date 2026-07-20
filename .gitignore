@@ -2,3 +2,5 @@ node_modules/
 db/
 *.png
 app.js
+public/uploads/*
+!public/uploads/.gitkeep

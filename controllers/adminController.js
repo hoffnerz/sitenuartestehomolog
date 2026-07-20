@@ -1,10 +1,37 @@
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const { removerArquivoAntigo } = require('../middleware/upload');
+
+// Controle de tentativas de login em memória (sem tocar no banco).
+// Reseta se o servidor reiniciar — suficiente para um painel de uso
+// interno, mas vale saber disso se a aplicação rodar em mais de uma instância.
+const tentativasLogin = new Map();
+const MAX_TENTATIVAS = 5;
+const BLOQUEIO_MS = 15 * 60 * 1000; // 15 minutos
+
+function registrarTentativaFalha(chave) {
+    const agora = Date.now();
+    const registro = tentativasLogin.get(chave) || { falhas: 0, bloqueadoAte: null };
+    registro.falhas += 1;
+    if (registro.falhas >= MAX_TENTATIVAS) {
+        registro.bloqueadoAte = agora + BLOQUEIO_MS;
+        registro.falhas = 0;
+    }
+    tentativasLogin.set(chave, registro);
+}
 
 
 exports.login = async (req, res) => {
     const { email, senha } = req.body;
+    const chave = (email || '').trim().toLowerCase();
+    const agora = Date.now();
+    const registro = tentativasLogin.get(chave);
+
+    if (registro && registro.bloqueadoAte && registro.bloqueadoAte > agora) {
+        const minutosRestantes = Math.ceil((registro.bloqueadoAte - agora) / 60000);
+        return res.render('admin/login', { erro: `Muitas tentativas incorretas. Tente novamente em ${minutosRestantes} minuto(s).` });
+    }
 
     try {
         const result = await pool.query('SELECT * FROM equipe WHERE email = $1', [email]);
@@ -13,14 +40,17 @@ exports.login = async (req, res) => {
         if (usuario) {
             const match = await bcrypt.compare(senha, usuario.senha);
             if (match && usuario.permissao === 'admin') {
+                tentativasLogin.delete(chave);
                 req.session.autenticado = true;
                 req.session.userEmail = usuario.email;
                 req.session.userPhoto = usuario.foto_url;
                 res.redirect('/admin/projetos');
             } else {
+                registrarTentativaFalha(chave);
                 res.render('admin/login', { erro: 'Email, senha ou permissão inválidos.' });
             }
         } else {
+            registrarTentativaFalha(chave);
             res.render('admin/login', { erro: 'Email, senha ou permissão inválidos.' });
         }
     } catch (err) {
@@ -141,8 +171,9 @@ exports.renderEquipeAdmin = async (req, res) => {
 exports.adicionarProjeto = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     const { titulo, descricao, imagem_url } = req.body;
+    const imagemFinal = req.file ? '/uploads/' + req.file.filename : (imagem_url || null);
     try {
-        await pool.query('INSERT INTO projetos (titulo, descricao, imagem_url, modificado_em, modificado_por) VALUES ($1, $2, $3, NOW(), $4)', [titulo, descricao, imagem_url, req.session.userEmail]);
+        await pool.query('INSERT INTO projetos (titulo, descricao, imagem_url, modificado_em, modificado_por) VALUES ($1, $2, $3, NOW(), $4)', [titulo, descricao, imagemFinal, req.session.userEmail]);
         res.redirect('/admin/projetos?sucesso=true');
     } catch (err) {
         console.error(err);
@@ -230,11 +261,12 @@ exports.adicionarNoticia = async (req, res) => {
 exports.adicionarMembroEquipe = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     const { nome, foto_url, descricao, lattes_url, funcao, senha, email, permissao } = req.body;
+    const fotoFinal = req.file ? '/uploads/' + req.file.filename : (foto_url || null);
 
     const hashedPassword = await bcrypt.hash(senha, saltRounds);
 
     try {
-        await pool.query('INSERT INTO equipe (nome, foto_url, descricao, lattes_url, funcao, senha, email, permissao, modificado_em, modificado_por) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), $9)', [nome, foto_url, descricao, lattes_url, funcao, hashedPassword, email, permissao, req.session.userEmail]);
+        await pool.query('INSERT INTO equipe (nome, foto_url, descricao, lattes_url, funcao, senha, email, permissao, modificado_em, modificado_por) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), $9)', [nome, fotoFinal, descricao, lattes_url, funcao, hashedPassword, email, permissao, req.session.userEmail]);
         res.redirect('/admin/equipe?sucesso=true');
     } catch (err) {
         console.error(err);
@@ -247,7 +279,13 @@ exports.deletarProjeto = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     const { id } = req.params;
     try {
+        const anterior = await pool.query('SELECT imagem_url FROM projetos WHERE id = $1', [id]);
+        const imagemAnterior = anterior.rows[0] ? anterior.rows[0].imagem_url : null;
+
         await pool.query('DELETE FROM projetos WHERE id = $1', [id]);
+
+        if (imagemAnterior) removerArquivoAntigo(imagemAnterior);
+
         res.redirect('/admin/projetos?sucesso=deletado');
     } catch (err) {
         console.error(err);
@@ -331,7 +369,13 @@ exports.deletarMembroEquipe = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     const { id } = req.params;
     try {
+        const anterior = await pool.query('SELECT foto_url FROM equipe WHERE id = $1', [id]);
+        const fotoAnterior = anterior.rows[0] ? anterior.rows[0].foto_url : null;
+
         await pool.query('DELETE FROM equipe WHERE id = $1', [id]);
+
+        if (fotoAnterior) removerArquivoAntigo(fotoAnterior);
+
         res.redirect('/admin/equipe?sucesso=deletado');
     } catch (err) {
         console.error(err);
@@ -344,8 +388,17 @@ exports.alterarProjeto = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     const { id } = req.params;
     const { titulo, descricao, imagem_url } = req.body;
+    const imagemFinal = req.file ? '/uploads/' + req.file.filename : (imagem_url || null);
     try {
-        await pool.query('UPDATE projetos SET titulo = $1, descricao = $2, imagem_url = $3, modificado_em = NOW(), modificado_por = $4 WHERE id = $5', [titulo, descricao, imagem_url, req.session.userEmail, id]);
+        const anterior = await pool.query('SELECT imagem_url FROM projetos WHERE id = $1', [id]);
+        const imagemAnterior = anterior.rows[0] ? anterior.rows[0].imagem_url : null;
+
+        await pool.query('UPDATE projetos SET titulo = $1, descricao = $2, imagem_url = $3, modificado_em = NOW(), modificado_por = $4 WHERE id = $5', [titulo, descricao, imagemFinal, req.session.userEmail, id]);
+
+        if (imagemAnterior && imagemAnterior !== imagemFinal) {
+            removerArquivoAntigo(imagemAnterior);
+        }
+
         res.redirect('/admin/projetos?sucesso=alterado');
     } catch (err) {
         console.error(err);
@@ -439,9 +492,22 @@ exports.alterarMembroEquipe = async (req, res) => {
     
     const { id } = req.params;
     const { nome, foto_url, descricao, lattes_url, funcao, senha, email, permissao } = req.body;
-    const hashedPassword = await bcrypt.hash(senha, saltRounds);
+    const fotoFinal = req.file ? '/uploads/' + req.file.filename : (foto_url || null);
+
+    // Só gera um novo hash se uma senha nova foi realmente digitada;
+    // caso contrário, o COALESCE abaixo mantém a senha já cadastrada.
+    const hashedPassword = senha && senha.trim() !== '' ? await bcrypt.hash(senha, saltRounds) : null;
+
     try {
-        await pool.query('UPDATE equipe SET nome = $1, foto_url = $2, descricao = $3, lattes_url = $4, funcao = $5, senha = $6, email = $7, permissao = $8, modificado_em = NOW(), modificado_por = $9 WHERE id = $10', [nome, foto_url, descricao, lattes_url, funcao, hashedPassword, email, permissao, req.session.userEmail, id]);
+        const anterior = await pool.query('SELECT foto_url FROM equipe WHERE id = $1', [id]);
+        const fotoAnterior = anterior.rows[0] ? anterior.rows[0].foto_url : null;
+
+        await pool.query('UPDATE equipe SET nome = $1, foto_url = $2, descricao = $3, lattes_url = $4, funcao = $5, senha = COALESCE($6, senha), email = $7, permissao = $8, modificado_em = NOW(), modificado_por = $9 WHERE id = $10', [nome, fotoFinal, descricao, lattes_url, funcao, hashedPassword, email, permissao, req.session.userEmail, id]);
+
+        if (fotoAnterior && fotoAnterior !== fotoFinal) {
+            removerArquivoAntigo(fotoAnterior);
+        }
+
         res.redirect('/admin/equipe?sucesso=alterado');
     } catch (err) {
         console.error(err);
