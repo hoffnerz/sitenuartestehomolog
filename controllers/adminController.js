@@ -513,11 +513,7 @@ exports.alterarMembroEquipe = async (req, res) => {
 
 exports.renderLogin = (req, res) => {
     if (req.session.autenticado) {
-        return res.redirect('/admin/projetos');
-    }
-
-    res.render('admin/login', { 
-        erro: null,
-        csrfToken: req.csrfToken()
-    });
+        return res.redirect('/admin/projetos'); 
+    }  
+    res.render('admin/login', { erro: null }); 
 };
