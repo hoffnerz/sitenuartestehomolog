@@ -3,9 +3,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const { removerArquivoAntigo } = require('../middleware/upload');
 
-// Controle de tentativas de login em memória (sem tocar no banco).
-// Reseta se o servidor reiniciar — suficiente para um painel de uso
-// interno, mas vale saber disso se a aplicação rodar em mais de uma instância.
+
 const tentativasLogin = new Map();
 const MAX_TENTATIVAS = 5;
 const BLOQUEIO_MS = 15 * 60 * 1000; // 15 minutos
@@ -494,8 +492,6 @@ exports.alterarMembroEquipe = async (req, res) => {
     const { nome, foto_url, descricao, lattes_url, funcao, senha, email, permissao } = req.body;
     const fotoFinal = req.file ? '/uploads/' + req.file.filename : (foto_url || null);
 
-    // Só gera um novo hash se uma senha nova foi realmente digitada;
-    // caso contrário, o COALESCE abaixo mantém a senha já cadastrada.
     const hashedPassword = senha && senha.trim() !== '' ? await bcrypt.hash(senha, saltRounds) : null;
 
     try {
@@ -515,10 +511,16 @@ exports.alterarMembroEquipe = async (req, res) => {
     }
 };
 
-    exports.renderLogin = (req, res) => {
+ exports.renderLogin = (req, res) => {
     if (req.session.autenticado) {
         return res.redirect('/admin/projetos'); 
-    }  
+    }  
+
+    res.render('admin/login', { 
+        erro: null,
+        csrfToken: req.csrfToken() // <-- A mágica acontece aqui
+    }); 
+};
 
     res.render('admin/login', { erro: null }); 
 };
