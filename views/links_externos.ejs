@@ -1,9 +1,7 @@
 <%- include('header.ejs') %>
 
-<!-- ===== PORTAL VOX ===== -->
 <main id="vox-portal" class="vox-portal-bg">
 
-    <!-- HERO VOX -->
     <div class="vox-hero">
         <div class="container mx-auto max-w-6xl px-4 py-16 md:py-24">
             <div class="flex flex-col md:flex-row items-center justify-between gap-8">
@@ -13,18 +11,29 @@
                         <h1 class="vox-masthead-title">VOX</h1>
                         <p class="vox-masthead-subtitle">Núcleo de Animação e Roteiro &mdash; IFMS Campo Grande</p>
                     </div>
+
                     <p class="text-purple-100 text-lg max-w-xl leading-relaxed mt-4">
                         O VOX é o jornal estudantil produzido pelo NuAR. Acompanhe todas as edições, matérias e conteúdos exclusivos produzidos pelos estudantes do IFMS.
                     </p>
                 </div>
+
                 <div class="vox-stats-grid flex-shrink-0">
                     <div class="vox-stat-card">
-                        <span class="vox-stat-number"><%= Object.keys(porAno).length %></span>
-                        <span class="vox-stat-label">Anos de publicação</span>
+                        <span class="vox-stat-number">
+                            <%= Object.keys(porAno).length %>
+                        </span>
+                        <span class="vox-stat-label">
+                            Anos de publicação
+                        </span>
                     </div>
+
                     <div class="vox-stat-card">
-                        <span class="vox-stat-number"><%= Object.values(porAno).reduce((acc, arr) => acc + arr.length, 0) %></span>
-                        <span class="vox-stat-label">Edições publicadas</span>
+                        <span class="vox-stat-number">
+                            <%= Object.values(porAno).reduce((acc, arr) => acc + arr.length, 0) %>
+                        </span>
+                        <span class="vox-stat-label">
+                            Edições publicadas
+                        </span>
                     </div>
                 </div>
             </div>
@@ -33,173 +42,384 @@
 
     <div class="container mx-auto max-w-6xl px-4 py-12 md:py-20">
 
-        <!-- ===== ÚLTIMAS EDIÇÕES (CARROSSEL COM DADOS REAIS) ===== -->
         <%
-            const anosOrdenados = Object.keys(porAno).sort((a, b) => b - a);
-            const edicoesRecentes = [];
-            for (const ano of anosOrdenados) {
-                for (const link of porAno[ano]) {
-                    edicoesRecentes.push({ ano, ...link });
-                    if (edicoesRecentes.length >= 8) break;
-                }
-                if (edicoesRecentes.length >= 8) break;
-            }
+            const anosOrdenados = Object.keys(porAno).sort(
+                (a, b) => Number(b) - Number(a)
+            );
         %>
 
         <% if (edicoesRecentes.length > 0) { %>
-        <section class="mb-16 animate-on-scroll" aria-labelledby="ultimas-edicoes-titulo">
+
+        <section
+            class="mb-16 animate-on-scroll"
+            aria-labelledby="ultimas-edicoes-titulo"
+        >
+
             <div class="flex items-center justify-between mb-8">
+
                 <div>
-                    <h2 id="ultimas-edicoes-titulo" class="text-2xl md:text-3xl font-bold text-[#3B2C5B]">Últimas Edições</h2>
-                    <p class="text-gray-500 mt-1">As edições mais recentes do VOX</p>
+                    <h2
+                        id="ultimas-edicoes-titulo"
+                        class="text-2xl md:text-3xl font-bold text-[#3B2C5B]"
+                    >
+                        Últimas Edições
+                    </h2>
+
+                    <p class="text-gray-500 mt-1">
+                        As edições mais recentes do VOX
+                    </p>
                 </div>
+
                 <div class="flex gap-2">
-                    <button class="carousel-prev vox-carousel-btn" aria-label="Edição anterior">
-                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+
+                    <button
+                        class="carousel-prev vox-carousel-btn"
+                        aria-label="Edição anterior"
+                    >
+                        <svg
+                            class="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
                     </button>
-                    <button class="carousel-next vox-carousel-btn" aria-label="Próxima edição">
-                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+
+                    <button
+                        class="carousel-next vox-carousel-btn"
+                        aria-label="Próxima edição"
+                    >
+                        <svg
+                            class="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
                     </button>
+
                 </div>
             </div>
 
             <div class="vox-carousel-wrapper overflow-x-auto pb-4">
+
                 <div class="flex gap-5 vox-carousel-track">
-                    <% edicoesRecentes.forEach((edicao, idx) => { %>
-                    <a href="<%= edicao.url %>" target="_blank" rel="noopener noreferrer"
-                       class="vox-edicao-card group flex-shrink-0"
-                       aria-label="Acessar edição: <%= edicao.titulo %>">
-                        <!-- Capa da Edição -->
+
+                    <% edicoesRecentes.forEach(edicao => { %>
+
+                    <a
+                        href="<%= edicao.url %>"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="vox-edicao-card group flex-shrink-0"
+                        aria-label="Acessar edição: <%= edicao.titulo %>"
+                    >
+
                         <div class="vox-edicao-capa">
+
                             <div class="vox-edicao-capa-inner">
-                                <div class="vox-edicao-logo">VOX</div>
-                                <div class="vox-edicao-ano"><%= edicao.ano %></div>
-                                <div class="vox-edicao-numero"><%= idx + 1 <= 9 ? 'Ed. 0' + (idx + 1) : 'Ed. ' + (idx + 1) %></div>
+
+                                <div class="vox-edicao-logo">
+                                    VOX
+                                </div>
+
+                                <div class="vox-edicao-ano">
+                                    <%= edicao.ano %>
+                                </div>
+
+                                <div class="vox-edicao-numero">
+                                    Ed. <%= String(edicao.numero_edicao).padStart(2, '0') %>
+                                </div>
+
                             </div>
+
                             <div class="vox-edicao-hover-overlay">
-                                <span class="text-white text-sm font-semibold">Acessar Edição</span>
+                                <span class="text-white text-sm font-semibold">
+                                    Acessar Edição
+                                </span>
                             </div>
+
                         </div>
-                        <!-- Informações -->
+
                         <div class="vox-edicao-info">
-                            <span class="vox-edicao-tag"><%= edicao.ano %></span>
-                            <h3 class="vox-edicao-titulo"><%= edicao.titulo %></h3>
+
+                            <span class="vox-edicao-tag">
+                                <%= edicao.ano %>
+                            </span>
+
+                            <h3 class="vox-edicao-titulo">
+                                <%= edicao.titulo %>
+                            </h3>
+
                             <% if (edicao.descricao) { %>
-                                <p class="vox-edicao-desc"><%= edicao.descricao.length > 80 ? edicao.descricao.slice(0, 80) + '...' : edicao.descricao %></p>
+
+                                <p class="vox-edicao-desc">
+                                    <%= edicao.descricao.length > 80
+                                        ? edicao.descricao.slice(0, 80) + '...'
+                                        : edicao.descricao
+                                    %>
+                                </p>
+
                             <% } %>
+
                         </div>
+
                     </a>
+
                     <% }) %>
+
                 </div>
             </div>
+
         </section>
+
         <% } %>
 
-        <!-- ===== ARQUIVO COMPLETO POR ANO ===== -->
-        <section class="animate-on-scroll" aria-labelledby="arquivo-titulo">
+        <section
+            class="animate-on-scroll"
+            aria-labelledby="arquivo-titulo"
+        >
+
             <div class="mb-10">
-                <h2 id="arquivo-titulo" class="text-2xl md:text-3xl font-bold text-[#3B2C5B]">Arquivo de Edições</h2>
-                <p class="text-gray-500 mt-1">Todas as edições organizadas por ano de publicação</p>
+
+                <h2
+                    id="arquivo-titulo"
+                    class="text-2xl md:text-3xl font-bold text-[#3B2C5B]"
+                >
+                    Arquivo de Edições
+                </h2>
+
+                <p class="text-gray-500 mt-1">
+                    Todas as edições organizadas por ano de publicação
+                </p>
+
             </div>
 
-            <!-- Navegação por Ano (âncoras) -->
             <% if (anosOrdenados.length > 1) { %>
-            <nav class="vox-year-nav mb-10" aria-label="Navegação por ano">
+
+            <nav
+                class="vox-year-nav mb-10"
+                aria-label="Navegação por ano"
+            >
+
                 <% anosOrdenados.forEach(ano => { %>
-                    <a href="#ano-<%= ano %>" class="vox-year-nav-item">
+
+                    <a
+                        href="#ano-<%= ano %>"
+                        class="vox-year-nav-item"
+                    >
+
                         <%= ano %>
-                        <span class="vox-year-count"><%= porAno[ano].length %></span>
+
+                        <span class="vox-year-count">
+                            <%= porAno[ano].length %>
+                        </span>
+
                     </a>
+
                 <% }) %>
+
             </nav>
+
             <% } %>
 
             <div class="space-y-12">
+
                 <% anosOrdenados.forEach(ano => { %>
-                <div id="ano-<%= ano %>" class="vox-ano-section animate-on-scroll">
-                    <!-- Cabeçalho do Ano -->
+
+                <div
+                    id="ano-<%= ano %>"
+                    class="vox-ano-section animate-on-scroll"
+                >
+
                     <div class="vox-ano-header">
-                        <div class="vox-ano-number"><%= ano %></div>
-                        <div class="vox-ano-divider"></div>
-                        <div class="vox-ano-meta">
-                            <span class="font-semibold text-[#3B2C5B]">Edições de <%= ano %></span>
-                            <span class="text-gray-400 text-sm"><%= porAno[ano].length %> publicação<%= porAno[ano].length !== 1 ? 'ões' : '' %></span>
+
+                        <div class="vox-ano-number">
+                            <%= ano %>
                         </div>
+
+                        <div class="vox-ano-divider"></div>
+
+                        <div class="vox-ano-meta">
+
+                            <span class="font-semibold text-[#3B2C5B]">
+                                Edições de <%= ano %>
+                            </span>
+
+                            <span class="text-gray-400 text-sm">
+                                <%= porAno[ano].length %>
+                                publicação<%= porAno[ano].length !== 1 ? 'ões' : '' %>
+                            </span>
+
+                        </div>
+
                     </div>
 
-                    <!-- Grid de Edições do Ano -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+
                         <% porAno[ano].forEach(link => { %>
-                        <a href="<%= link.url %>" target="_blank" rel="noopener noreferrer"
-                           class="vox-link-card group">
+
+                        <a
+                            href="<%= link.url %>"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="vox-link-card group"
+                        >
+
                             <div class="vox-link-card-header">
+
                                 <div class="vox-link-icon">
-                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clip-rule="evenodd"/>
-                                        <path d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V7z"/>
+
+                                    <svg
+                                        class="h-5 w-5"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
+
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z"
+                                            clip-rule="evenodd"
+                                        />
+
+                                        <path
+                                            d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V7z"
+                                        />
+
                                     </svg>
+
                                 </div>
-                                <span class="vox-link-year-tag"><%= ano %></span>
+
+                                <span class="vox-link-year-tag">
+                                    <%= ano %>
+                                </span>
+
                             </div>
-                            <h4 class="vox-link-titulo"><%= link.titulo %></h4>
+
+                            <h4 class="vox-link-titulo">
+                                <%= link.titulo %>
+                            </h4>
+
                             <% if (link.descricao) { %>
-                                <p class="vox-link-desc"><%= link.descricao %></p>
+
+                                <p class="vox-link-desc">
+                                    <%= link.descricao %>
+                                </p>
+
                             <% } %>
+
                             <div class="vox-link-action">
-                                <span>Acessar edição</span>
-                                <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+
+                                <span>
+                                    Acessar edição
+                                </span>
+
+                                <svg
+                                    class="h-4 w-4 group-hover:translate-x-1 transition-transform"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
+
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"
+                                    />
+
                                 </svg>
+
                             </div>
+
                         </a>
+
                         <% }) %>
+
                     </div>
+
                 </div>
+
                 <% }) %>
+
             </div>
 
             <% if (!porAno || Object.keys(porAno).length === 0) { %>
+
                 <div class="text-center py-20">
-                    <p class="text-gray-400 text-lg">Nenhuma edição cadastrada ainda.</p>
+
+                    <p class="text-gray-400 text-lg">
+                        Nenhuma edição cadastrada ainda.
+                    </p>
+
                 </div>
+
             <% } %>
+
         </section>
 
-        <!-- ===== CTA CONTRIBUIÇÃO ===== -->
-        <section class="vox-cta-section mt-8 animate-on-scroll" aria-labelledby="cta-titulo">
+        <section
+            class="vox-cta-section mt-8 animate-on-scroll"
+            aria-labelledby="cta-titulo"
+        >
+
             <div class="text-center">
-                <h2 id="cta-titulo" class="text-2xl md:text-3xl font-bold text-white mb-4">Quer Contribuir com o VOX?</h2>
+
+                <h2
+                    id="cta-titulo"
+                    class="text-2xl md:text-3xl font-bold text-white mb-4"
+                >
+                    Quer Contribuir com o VOX?
+                </h2>
+
                 <p class="text-purple-100 text-lg mb-8 max-w-xl mx-auto">
                     Tem uma matéria, sugestão ou feedback sobre o VOX? Entre em contato com a equipe do NuAR!
                 </p>
-                <a href="mailto:nuar.lab.cg@ifms.edu.br"
-                   class="vox-cta-btn">
+
+                <a
+                    href="mailto:nuar.lab.cg@ifms.edu.br"
+                    class="vox-cta-btn"
+                >
                     Enviar Mensagem
                 </a>
+
             </div>
+
         </section>
 
     </div>
+
 </main>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Carrossel horizontal das últimas edições
     const carouselTrack = document.querySelector('.vox-carousel-track');
     const prevBtn = document.querySelector('.carousel-prev');
     const nextBtn = document.querySelector('.carousel-next');
 
     if (carouselTrack && prevBtn && nextBtn) {
         const scrollAmount = 320;
+
         prevBtn.addEventListener('click', () => {
-            carouselTrack.parentElement.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            carouselTrack.parentElement.scrollBy({
+                left: -scrollAmount,
+                behavior: 'smooth'
+            });
         });
+
         nextBtn.addEventListener('click', () => {
-            carouselTrack.parentElement.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            carouselTrack.parentElement.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
         });
     }
-
-
 });
 </script>
 
