@@ -1,5 +1,6 @@
 const pool = require('../db');
 const bcrypt = require('bcrypt');
+const { obterEstatisticas } = require('../middleware/estatisticas');
 const saltRounds = 10;
 const { removerArquivoAntigo } = require('../middleware/upload');
 
@@ -65,6 +66,20 @@ exports.logout = (req, res) => {
         res.clearCookie('connect.sid');
         res.redirect('/admin');
     });
+};
+
+exports.renderEstatisticas = (req, res) => {
+    if (!req.session.autenticado) return res.redirect('/admin');
+    try {
+        const estatisticas = obterEstatisticas();
+        res.render('admin/estatisticas', {
+            ...estatisticas,
+            userPhoto: req.session.userPhoto
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao carregar estatísticas');
+    }
 };
 
 exports.renderProjetosAdmin = async (req, res) => {
