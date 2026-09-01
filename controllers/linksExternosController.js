@@ -1,4 +1,5 @@
 const pool = require('../db');
+const { registrarClique } = require('../middleware/estatisticas');
 
 exports.listar = async (req, res) => {
   try {
@@ -50,5 +51,24 @@ exports.listar = async (req, res) => {
   } catch (err) {
     console.error('Erro ao buscar links externos:', err);
     res.status(500).send('Erro ao buscar links externos');
+  }
+};
+
+exports.registrarCliqueRedirecionar = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query('SELECT titulo, url FROM link_externos WHERE id = $1', [id]);
+    const link = result.rows[0];
+
+    if (!link) {
+      return res.redirect('/links');
+    }
+    registrarClique(req, { linkId: id, titulo: link.titulo });
+
+    res.redirect(link.url);
+  } catch (err) {
+    console.error('Erro ao registrar clique e redirecionar:', err);
+    res.redirect('/links');
   }
 };
