@@ -116,7 +116,7 @@
                     <% edicoesRecentes.forEach(edicao => { %>
 
                     <a
-                        href="<%= edicao.url %>"
+                        href="/links/click/<%= edicao.id %>"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="vox-edicao-card group flex-shrink-0"
@@ -268,7 +268,7 @@
                         <% porAno[ano].forEach(link => { %>
 
                         <a
-                            href="<%= link.url %>"
+                            href="/links/click/<%= link.id %>"
                             target="_blank"
                             rel="noopener noreferrer"
                             class="vox-link-card group"
