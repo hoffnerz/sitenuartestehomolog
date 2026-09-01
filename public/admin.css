@@ -892,3 +892,73 @@
     gap: 0.75rem;
 }
 .admin-modal__actions .admin-btn { flex: 1; }
+
+/* ---------- Estatísticas (dashboard de acessos) ---------- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.stats-kpi {
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+}
+
+.stats-kpi__label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 0.35rem;
+}
+
+.stats-kpi__value {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+}
+
+.stats-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .stats-charts-grid { grid-template-columns: 2fr 1fr; }
+}
+
+.stats-panel {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.stats-panel--full { grid-column: 1 / -1; }
+
+.stats-panel h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0 0 1rem;
+}
+
+.stats-panel__empty {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.stats-panel canvas { max-height: 320px; }
