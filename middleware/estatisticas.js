@@ -148,7 +148,9 @@ function obterEstatisticas({ inicio, fim } = {}) {
     };
 }
 
-module.exports = { registrarClique, obterEstatisticas };
+function registrarAcesso(req, res, next) { next(); }
+
+module.exports = { registrarAcesso, registrarClique, obterEstatisticas };
 
 // A limpeza também ocorre quando não há cliques, sem manter um timer permanente.
 limparArquivosAntigos();
