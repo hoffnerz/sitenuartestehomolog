@@ -1,6 +1,23 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/admin.css">
-<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    .stats-chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+    .stats-chart-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); padding: 1.25rem; }
+    .stats-chart-card h3 { margin: 0 0 1rem; color: var(--color-primary); font-size: 1.05rem; font-weight: 700; }
+    .stats-bars { display: flex; align-items: flex-end; gap: .45rem; min-height: 12rem; padding: 1rem .25rem 0; border-bottom: 1px solid var(--color-border); }
+    .stats-bar-column { display: flex; flex: 1; min-width: 0; height: 11rem; flex-direction: column; align-items: center; justify-content: flex-end; gap: .35rem; }
+    .stats-bar-value { color: var(--color-primary); font-size: .7rem; font-weight: 700; }
+    .stats-bar { width: 100%; max-width: 1.4rem; min-height: .2rem; border-radius: .4rem .4rem 0 0; background: linear-gradient(180deg, var(--color-accent), var(--color-primary-light)); }
+    .stats-bar-label { width: 2.5rem; overflow: hidden; color: var(--color-text-muted); font-size: .65rem; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+    .stats-ranking { display: flex; flex-direction: column; gap: .9rem; }
+    .stats-ranking-row { display: grid; grid-template-columns: minmax(0, 1fr) 3rem; gap: .7rem; align-items: center; }
+    .stats-ranking-title { overflow: hidden; color: var(--color-text); font-size: .85rem; text-overflow: ellipsis; white-space: nowrap; }
+    .stats-ranking-total { color: var(--color-primary); font-size: .8rem; font-weight: 700; text-align: right; }
+    .stats-ranking-track { grid-column: 1 / -1; height: .45rem; overflow: hidden; border-radius: 999px; background: var(--color-bg-alt); }
+    .stats-ranking-fill { height: 100%; border-radius: inherit; background: var(--color-accent); }
+    .stats-empty { color: var(--color-text-muted); font-size: .9rem; }
+</style>
 
 <section class="admin-page">
     <div class="admin-shell">
@@ -43,8 +60,46 @@
                     </div>
                 </div>
 
+                <% const maxDia = Math.max(...cliquesPorDia.map(item => item.total), 1); %>
+                <% const maxLink = Math.max(...linksMaisClicados.map(item => item.total), 1); %>
+                <div class="stats-chart-grid">
+                    <section class="stats-chart-card" aria-labelledby="chart-dias-title">
+                        <h3 id="chart-dias-title">Cliques por dia</h3>
+                        <% if (cliquesPorDia.every(item => item.total === 0)) { %>
+                            <p class="stats-empty">Ainda não há cliques registrados nesse período.</p>
+                        <% } else { %>
+                            <div class="stats-bars" role="img" aria-label="Gráfico de cliques por dia">
+                                <% cliquesPorDia.forEach(item => { %>
+                                    <div class="stats-bar-column" title="<%= item.dia %>: <%= item.total %> clique(s)">
+                                        <span class="stats-bar-value"><%= item.total || '' %></span>
+                                        <div class="stats-bar" style="height: <%= Math.max((item.total / maxDia) * 100, item.total ? 4 : 0) %>%"></div>
+                                        <span class="stats-bar-label"><%= item.dia.slice(5).split('-').reverse().join('/') %></span>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    </section>
+
+                    <section class="stats-chart-card" aria-labelledby="chart-links-title">
+                        <h3 id="chart-links-title">Ranking de links</h3>
+                        <% if (linksMaisClicados.length === 0) { %>
+                            <p class="stats-empty">Nenhum link recebeu cliques nesse período.</p>
+                        <% } else { %>
+                            <div class="stats-ranking" role="img" aria-label="Ranking dos links mais clicados">
+                                <% linksMaisClicados.forEach(item => { %>
+                                    <div class="stats-ranking-row" title="<%= item.nome %>: <%= item.total %> clique(s)">
+                                        <span class="stats-ranking-title"><%= item.nome %></span>
+                                        <span class="stats-ranking-total"><%= item.total %></span>
+                                        <div class="stats-ranking-track"><div class="stats-ranking-fill" style="width: <%= (item.total / maxLink) * 100 %>%"></div></div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    </section>
+                </div>
+
                 <div class="admin-section-heading">
-                    <h4 class="admin-section-heading__title">Links mais clicados</h4>
+                    <h4 class="admin-section-heading__title">Detalhamento por link</h4>
                 </div>
                 <% if (linksMaisClicados.length === 0) { %>
                     <p class="admin-hint">Ainda não há cliques registrados nesse período.</p>
@@ -60,20 +115,6 @@
                         </table>
                     </div>
                 <% } %>
-
-                <div class="admin-section-heading mt-8">
-                    <h4 class="admin-section-heading__title">Cliques por dia</h4>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead><tr><th class="py-3 pr-4">Dia</th><th class="py-3">Cliques</th></tr></thead>
-                        <tbody>
-                            <% cliquesPorDia.forEach(item => { %>
-                                <tr class="border-t border-gray-100"><td class="py-3 pr-4"><%= item.dia %></td><td class="py-3"><%= item.total %></td></tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </main>
     </div>
