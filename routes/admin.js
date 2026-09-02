@@ -27,6 +27,7 @@ router.get('/feiras', adminController.renderFeirasAdmin);
 router.get('/editais', adminController.renderEditaisAdmin);
 router.get('/noticias', adminController.renderNoticiasAdmin);
 router.get('/equipe', adminController.renderEquipeAdmin);
+router.get('/estatisticas', adminController.renderEstatisticas);
 
 // Rotas de Inserção, Deleção e Alteração
 // Nas rotas que recebem upload de arquivo (multipart/form-data), o multer

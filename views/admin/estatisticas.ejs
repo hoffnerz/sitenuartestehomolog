@@ -1,0 +1,78 @@
+<link rel="stylesheet" href="/admin.css">
+
+<section class="admin-page animate-on-scroll">
+    <div class="admin-shell">
+        <div class="admin-topbar">
+            <span class="admin-topbar__title">Painel NuAR</span>
+            <button type="button" id="adminSidebarOpenBtn" class="admin-topbar__toggle">Menu</button>
+        </div>
+
+        <%- include('../_admin_sidebar.ejs') %>
+
+        <main class="admin-main">
+            <div class="admin-card">
+                <div class="admin-page-header">
+                    <div>
+                        <span class="admin-page-header__eyebrow">Painel de administração</span>
+                        <h2 class="admin-page-header__title">Cliques em links externos</h2>
+                        <p class="admin-page-header__count">Período de <%= inicio %> a <%= fim %></p>
+                    </div>
+                </div>
+
+                <div class="admin-form-panel">
+                    <p class="admin-hint">Resumo automático dos últimos 30 dias. Os arquivos antigos são removidos conforme a política de retenção configurada.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
+                    <div class="admin-card admin-stat-card">
+                        <span class="admin-page-header__eyebrow">Total no período</span>
+                        <strong class="admin-page-header__title"><%= totalCliques %></strong>
+                        <span class="admin-hint">cliques registrados</span>
+                    </div>
+                    <div class="admin-card admin-stat-card">
+                        <span class="admin-page-header__eyebrow">Links com cliques</span>
+                        <strong class="admin-page-header__title"><%= linksMaisClicados.length %></strong>
+                        <span class="admin-hint">no ranking exibido</span>
+                    </div>
+                    <div class="admin-card admin-stat-card">
+                        <span class="admin-page-header__eyebrow">Retenção</span>
+                        <strong class="admin-page-header__title">180 dias</strong>
+                        <span class="admin-hint">configurável por variável de ambiente</span>
+                    </div>
+                </div>
+
+                <div class="admin-section-heading">
+                    <h4 class="admin-section-heading__title">Links mais clicados</h4>
+                </div>
+                <% if (linksMaisClicados.length === 0) { %>
+                    <p class="admin-hint">Ainda não há cliques registrados nesse período.</p>
+                <% } else { %>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead><tr><th class="py-3 pr-4">Link</th><th class="py-3">Cliques</th></tr></thead>
+                            <tbody>
+                                <% linksMaisClicados.forEach(item => { %>
+                                    <tr class="border-t border-gray-100"><td class="py-3 pr-4 font-medium"><%= item.nome %></td><td class="py-3"><%= item.total %></td></tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } %>
+
+                <div class="admin-section-heading mt-8">
+                    <h4 class="admin-section-heading__title">Cliques por dia</h4>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead><tr><th class="py-3 pr-4">Dia</th><th class="py-3">Cliques</th></tr></thead>
+                        <tbody>
+                            <% cliquesPorDia.forEach(item => { %>
+                                <tr class="border-t border-gray-100"><td class="py-3 pr-4"><%= item.dia %></td><td class="py-3"><%= item.total %></td></tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</section>
