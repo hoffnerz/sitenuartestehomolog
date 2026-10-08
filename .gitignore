@@ -5,3 +5,6 @@ app.js
 public/uploads/*
 !public/uploads/.gitkeep
 data/*.jsonl
+
+# Metadados complementares de produções e galerias de feiras
+data/conteudo-metadata.json
