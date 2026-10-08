@@ -61,6 +61,12 @@
                                 <label for="producao-titulo-input">Título</label>
                                 <input type="text" name="titulo" id="producao-titulo-input" placeholder="Título da produção" required class="admin-input">
                             </div>
+                            <div class="admin-field">
+                                <label for="producao-tipo-input">Tipo</label>
+                                <select name="tipo" id="producao-tipo-input" required class="admin-select">
+                                    <option value="Feira">Feira</option><option value="Podcast">Podcast</option><option value="Livro">Livro</option><option value="Animacoes">Animações</option>
+                                </select>
+                            </div>
                             <div class="admin-field admin-field--full">
                                 <label for="producao-descricao-input">Descrição</label>
                                 <textarea name="descricao" id="producao-descricao-input" placeholder="Descrição da produção" required rows="4" class="admin-textarea"></textarea>
@@ -110,10 +116,11 @@
                 <% } else { %>
                     <ul class="admin-item-list">
                         <% producoes.forEach(item => { %>
-                        <li class="admin-item-card" data-search="<%= item.titulo %> <%= item.descricao %>">
+                        <li class="admin-item-card" data-search="<%= item.titulo %> <%= item.descricao %> <%= tiposProducao[String(item.id)] %>">
                             <div class="admin-item-card__main">
                                 <div class="admin-item-card__body">
                                     <h5 class="admin-item-card__title"><%= item.titulo %></h5>
+                                    <span class="admin-badge"><%= tiposProducao[String(item.id)] === 'Animacoes' ? 'Animações' : tiposProducao[String(item.id)] %></span>
                                     <div class="admin-item-card__meta">
                                         <% if (item.data_publicacao) { %>
                                             <span class="admin-badge"><%= new Date(item.data_publicacao).toLocaleDateString('pt-BR') %></span>
@@ -131,7 +138,7 @@
                                 </div>
                             </div>
                             <div class="admin-item-card__actions">
-                                <button type="button" onclick='preencherFormProducao(<%- JSON.stringify(item) %>)' class="admin-btn admin-btn--edit admin-btn--sm">
+                                <button type="button" onclick='preencherFormProducao(<%- JSON.stringify({...item, tipo: tiposProducao[String(item.id)] || "Animacoes"}) %>)' class="admin-btn admin-btn--edit admin-btn--sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
                                     Alterar
                                 </button>
@@ -170,7 +177,8 @@
         document.getElementById('producao-descricao-input').value = item.descricao;
         document.getElementById('producao-link_externo-input').value = item.link_externo;
         document.getElementById('producao-data_publicacao-input').value = item.data_publicacao ? new Date(item.data_publicacao).toISOString().split('T')[0] : '';
-        document.getElementById('producao-projeto_id-input').value = item.projeto_id;
+        document.getElementById('producao-projeto_id-input').value = item.projeto_id || '';
+        document.getElementById('producao-tipo-input').value = item.tipo || 'Animacoes';
         document.getElementById('form-producoes-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     document.getElementById('btn-adicionar-producao').addEventListener('click', function() {

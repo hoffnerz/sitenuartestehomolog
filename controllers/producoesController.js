@@ -1,5 +1,6 @@
 // controllers/producoesController.js
 const pool = require('../db');
+const conteudoMetadata = require('../middleware/conteudoMetadata');
 
 exports.listar = async (req, res) => {
   try {
@@ -12,8 +13,10 @@ exports.listar = async (req, res) => {
     
     const projetosResult = await pool.query('SELECT * FROM projetos ORDER BY titulo ASC');
     
+    const tipos = conteudoMetadata.obterTiposProducoes(result.rows.map(item => item.id));
+    const producoes = result.rows.map(item => ({ ...item, tipo: tipos[String(item.id)] || 'Animacoes' }));
     res.render('producoes', { 
-        producoes: result.rows, 
+        producoes, 
         projetos: projetosResult.rows,
         userPhoto: req.session.userPhoto || null
     });

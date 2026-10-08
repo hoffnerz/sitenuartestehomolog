@@ -1,0 +1,52 @@
+<%- include('../header.ejs') %>
+<link rel="stylesheet" href="/admin.css">
+<section class="admin-page animate-on-scroll">
+    <div class="admin-shell">
+        <div class="admin-topbar"><span class="admin-topbar__title">Painel NuAR</span><button type="button" id="adminSidebarOpenBtn" class="admin-topbar__toggle">Menu</button></div>
+        <%- include('../_admin_sidebar.ejs') %>
+        <main class="admin-main">
+            <div class="admin-card">
+                <div class="admin-page-header"><div><span class="admin-page-header__eyebrow">Painel de administração</span><h2 class="admin-page-header__title">Página inicial</h2><p class="admin-page-header__count">Edite os textos e as imagens exibidos na página principal.</p></div></div>
+                <% if (sucesso) { %><div class="admin-alert admin-alert--success"><span>Conteúdo da página inicial salvo com sucesso.</span></div><% } %>
+                <form action="/admin/pagina-inicial" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="admin-section-heading"><h3 class="admin-section-heading__title">Destaque principal</h3></div>
+                    <div class="admin-form-grid">
+                        <div class="admin-field"><label>Etiqueta superior</label><input class="admin-input" name="hero_etiqueta" value="<%= homepage.hero.etiqueta %>"></div>
+                        <div class="admin-field admin-field--full"><label>Título (quebras de linha são mantidas)</label><textarea class="admin-textarea" name="hero_titulo" rows="3"><%= homepage.hero.titulo %></textarea></div>
+                        <div class="admin-field admin-field--full"><label>Descrição</label><textarea class="admin-textarea" name="hero_descricao" rows="4"><%= homepage.hero.descricao %></textarea></div>
+                        <div class="admin-field"><label>Texto do botão 1</label><input class="admin-input" name="hero_botao1Texto" value="<%= homepage.hero.botao1Texto %>"></div>
+                        <div class="admin-field"><label>Link do botão 1</label><input class="admin-input" name="hero_botao1Url" value="<%= homepage.hero.botao1Url %>"></div>
+                        <div class="admin-field"><label>Texto do botão 2</label><input class="admin-input" name="hero_botao2Texto" value="<%= homepage.hero.botao2Texto %>"></div>
+                        <div class="admin-field"><label>Link do botão 2</label><input class="admin-input" name="hero_botao2Url" value="<%= homepage.hero.botao2Url %>"></div>
+                        <div class="admin-field admin-field--full"><label>Imagens do carrossel (selecionar arquivos substitui as atuais)</label><input class="admin-input" type="file" name="homepage_imagens" accept="image/jpeg,image/png,image/webp,image/gif" multiple><small>JPG, PNG, WEBP ou GIF; até 12 imagens por envio, 5 MB cada.</small><div class="flex gap-3 flex-wrap mt-3"><% homepage.hero.imagens.forEach(src => { %><img src="<%= src %>" alt="Imagem atual do destaque" width="110" height="70" class="object-cover rounded"><% }) %></div></div>
+                    </div>
+                    <div class="admin-section-heading"><h3 class="admin-section-heading__title">Linha do tempo</h3></div>
+                    <div class="admin-form-grid">
+                        <div class="admin-field"><label>Subtítulo</label><input class="admin-input" name="timeline_subtitulo" value="<%= homepage.timelineSubtitulo %>"></div>
+                        <div class="admin-field"><label>Título</label><input class="admin-input" name="timeline_titulo" value="<%= homepage.timelineTitulo %>"></div>
+                        <% homepage.timeline.forEach((item, i) => { %>
+                        <div class="admin-field"><label>Ano / marco <%= i + 1 %></label><input class="admin-input" name="timeline_ano_<%= i %>" value="<%= item.ano %>"></div>
+                        <div class="admin-field"><label>Texto do marco <%= i + 1 %></label><textarea class="admin-textarea" name="timeline_texto_<%= i %>" rows="3"><%= item.texto %></textarea></div>
+                        <% }) %>
+                    </div>
+                    <div class="admin-section-heading"><h3 class="admin-section-heading__title">Informações institucionais</h3></div>
+                    <div class="admin-form-grid">
+                        <div class="admin-field"><label>Subtítulo</label><input class="admin-input" name="institucional_subtitulo" value="<%= homepage.institucionalSubtitulo %>"></div>
+                        <div class="admin-field"><label>Título</label><input class="admin-input" name="institucional_titulo" value="<%= homepage.institucionalTitulo %>"></div>
+                        <% homepage.institucional.forEach((item, i) => { %>
+                        <div class="admin-field admin-field--full"><h4>Cartão institucional <%= i + 1 %></h4></div>
+                        <div class="admin-field"><label>Título do cartão</label><input class="admin-input" name="inst_titulo_<%= i %>" value="<%= item.titulo %>"></div>
+                        <div class="admin-field"><label>Texto do botão</label><input class="admin-input" name="inst_botao_<%= i %>" value="<%= item.botao %>"></div>
+                        <div class="admin-field admin-field--full"><label>Descrição</label><textarea class="admin-textarea" name="inst_texto_<%= i %>" rows="4"><%= item.texto %></textarea></div>
+                        <div class="admin-field admin-field--full"><label>Link</label><input class="admin-input" name="inst_url_<%= i %>" value="<%= item.url %>"></div>
+                        <% }) %>
+                    </div>
+                    <div class="admin-form-actions"><button type="submit" class="admin-btn admin-btn--primary">Salvar página inicial</button></div>
+                </form>
+            </div>
+        </main>
+    </div>
+</section>
+<script src="/admin.js"></script>
+<%- include('../footer.ejs') %>

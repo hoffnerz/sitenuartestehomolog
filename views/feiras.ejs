@@ -18,6 +18,20 @@
                         </div>
                     </div>
                     <div class="flex-grow">
+                        <% if (feira.imagens && feira.imagens.length) { %>
+                        <div class="feira-carousel relative mb-5" data-carousel>
+                            <div class="overflow-hidden rounded-xl">
+                                <% feira.imagens.forEach((imagem, indice) => { %>
+                                <img src="<%= imagem %>" alt="<%= feira.titulo %> — imagem <%= indice + 1 %>" loading="lazy" class="w-full h-56 md:h-72 object-cover <%= indice === 0 ? '' : 'hidden' %>" data-slide>
+                                <% }) %>
+                            </div>
+                            <% if (feira.imagens.length > 1) { %>
+                            <button type="button" data-prev aria-label="Imagem anterior" class="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow">‹</button>
+                            <button type="button" data-next aria-label="Próxima imagem" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow">›</button>
+                            <div class="flex justify-center gap-2 mt-3"><% feira.imagens.forEach((_, indice) => { %><button type="button" data-dot="<%= indice %>" aria-label="Ir para imagem <%= indice + 1 %>" class="h-2.5 w-2.5 rounded-full <%= indice === 0 ? 'bg-[#C46ED8]' : 'bg-gray-300' %>"></button><% }) %></div>
+                            <% } %>
+                        </div>
+                        <% } %>
                         <h2 class="text-xl font-bold text-[#3B2C5B] mb-2 leading-tight group-hover:text-[#C46ED8] transition-colors">
                             <%= feira.titulo %>
                         </h2>
@@ -45,4 +59,19 @@
     </div>
 </section>
 
+<script>
+    document.querySelectorAll('[data-carousel]').forEach(carousel => {
+        const slides = [...carousel.querySelectorAll('[data-slide]')];
+        const dots = [...carousel.querySelectorAll('[data-dot]')];
+        let atual = 0;
+        const mostrar = indice => {
+            atual = (indice + slides.length) % slides.length;
+            slides.forEach((slide, i) => slide.classList.toggle('hidden', i !== atual));
+            dots.forEach((dot, i) => { dot.classList.toggle('bg-[#C46ED8]', i === atual); dot.classList.toggle('bg-gray-300', i !== atual); });
+        };
+        carousel.querySelector('[data-prev]')?.addEventListener('click', () => mostrar(atual - 1));
+        carousel.querySelector('[data-next]')?.addEventListener('click', () => mostrar(atual + 1));
+        dots.forEach(dot => dot.addEventListener('click', () => mostrar(Number(dot.dataset.dot))));
+    });
+</script>
 <%- include('footer.ejs') %>

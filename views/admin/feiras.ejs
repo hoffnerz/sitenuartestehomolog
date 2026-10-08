@@ -53,7 +53,7 @@
                         </svg>
                         Adicionar Nova Feira
                     </h4>
-                    <form id="form-feira" action="/admin/adicionar-feira" method="POST">
+                    <form id="form-feira" action="/admin/adicionar-feira" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <input type="hidden" name="id" id="feira-id-input">
                         <div class="admin-form-grid">
@@ -72,6 +72,11 @@
                             <div class="admin-field">
                                 <label for="feira-link_externo-input">Link externo</label>
                                 <input type="text" name="link_externo" id="feira-link_externo-input" placeholder="https://..." class="admin-input">
+                            </div>
+                            <div class="admin-field admin-field--full">
+                                <label for="feira-imagens-input">Imagens da feira (opcional; até 12 por envio)</label>
+                                <input type="file" name="imagens_feira" id="feira-imagens-input" accept="image/jpeg,image/png,image/webp,image/gif" multiple class="admin-input">
+                                <small>Ao editar, novas imagens serão adicionadas à galeria existente.</small>
                             </div>
                             <div class="admin-field admin-field--full">
                                 <label for="feira-projeto_id-input">Projeto vinculado</label>
@@ -114,6 +119,9 @@
                             <div class="admin-item-card__main">
                                 <div class="admin-item-card__body">
                                     <h5 class="admin-item-card__title"><%= item.titulo %></h5>
+                                    <% const galeria = imagensFeira[String(item.id)] || []; if (galeria.length) { %>
+                                        <div class="flex gap-2 mt-2 flex-wrap"><% galeria.forEach(src => { %><img src="<%= src %>" alt="Imagem de <%= item.titulo %>" width="72" height="48" class="object-cover rounded"><% }) %></div>
+                                    <% } %>
                                     <div class="admin-item-card__meta">
                                         <% if (item.ano) { %>
                                             <span class="admin-badge admin-badge--accent"><%= item.ano %></span>

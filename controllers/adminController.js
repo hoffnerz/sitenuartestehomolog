@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const { obterEstatisticas } = require('../middleware/estatisticas');
 const saltRounds = 10;
 const { removerArquivoAntigo } = require('../middleware/upload');
+const conteudoMetadata = require('../middleware/conteudoMetadata');
 
 
 const tentativasLogin = new Map();
@@ -68,6 +69,49 @@ exports.logout = (req, res) => {
     });
 };
 
+exports.renderPaginaInicialAdmin = (req, res) => {
+    if (!req.session.autenticado) return res.redirect('/admin');
+    try {
+        res.render('admin/index', {
+            homepage: conteudoMetadata.obterHomepage(),
+            sucesso: req.query.sucesso === 'true',
+            userPhoto: req.session.userPhoto
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao carregar a página inicial');
+    }
+};
+
+exports.salvarPaginaInicial = (req, res) => {
+    if (!req.session.autenticado) return res.redirect('/admin');
+    try {
+        const atual = conteudoMetadata.obterHomepage();
+        const body = req.body;
+        const imagens = (req.files || []).map(file => '/uploads/' + file.filename);
+        const homepage = {
+            hero: {
+                etiqueta: body.hero_etiqueta || '', titulo: body.hero_titulo || '', descricao: body.hero_descricao || '',
+                botao1Texto: body.hero_botao1Texto || '', botao1Url: body.hero_botao1Url || '',
+                botao2Texto: body.hero_botao2Texto || '', botao2Url: body.hero_botao2Url || '',
+                imagens: imagens.length ? imagens : atual.hero.imagens
+            },
+            timelineTitulo: body.timeline_titulo || '', timelineSubtitulo: body.timeline_subtitulo || '',
+            timeline: atual.timeline.map((item, i) => ({ ano: body['timeline_ano_' + i] || '', texto: body['timeline_texto_' + i] || '' })),
+            institucionalTitulo: body.institucional_titulo || '', institucionalSubtitulo: body.institucional_subtitulo || '',
+            institucional: atual.institucional.map((item, i) => ({
+                titulo: body['inst_titulo_' + i] || '', texto: body['inst_texto_' + i] || '',
+                url: body['inst_url_' + i] || '', botao: body['inst_botao_' + i] || ''
+            }))
+        };
+        conteudoMetadata.salvarHomepage(homepage);
+        res.redirect('/admin/pagina-inicial?sucesso=true');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao salvar a página inicial');
+    }
+};
+
 exports.renderEstatisticas = (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     try {
@@ -114,8 +158,9 @@ exports.renderProducoesAdmin = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     try {
         const producoes = await pool.query('SELECT * FROM producoes ORDER BY titulo ASC');
+        const tiposProducao = conteudoMetadata.obterTiposProducoes(producoes.rows.map(item => item.id));
         const projetos = await pool.query('SELECT id, titulo FROM projetos ORDER BY titulo ASC');
-        res.render('admin/producoes', { producoes: producoes.rows, projetos: projetos.rows, sucesso: req.query.sucesso, userPhoto: req.session.userPhoto });
+        res.render('admin/producoes', { producoes: producoes.rows, tiposProducao, projetos: projetos.rows, sucesso: req.query.sucesso, userPhoto: req.session.userPhoto });
     } catch (err) {
         console.error(err);
         res.status(500).send('Erro ao carregar produções');
@@ -138,8 +183,9 @@ exports.renderFeirasAdmin = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     try {
         const feiras = await pool.query('SELECT * FROM feiras ORDER BY titulo ASC');
+        const imagensFeira = conteudoMetadata.obterImagensFeira(feiras.rows.map(item => item.id));
         const projetos = await pool.query('SELECT id, titulo FROM projetos ORDER BY titulo ASC');
-        res.render('admin/feiras', { feiras: feiras.rows, projetos: projetos.rows, sucesso: req.query.sucesso, userPhoto: req.session.userPhoto });
+        res.render('admin/feiras', { feiras: feiras.rows, imagensFeira, projetos: projetos.rows, sucesso: req.query.sucesso, userPhoto: req.session.userPhoto });
     } catch (err) {
         console.error(err);
         res.status(500).send('Erro ao carregar feiras');
@@ -211,9 +257,12 @@ exports.adicionarLinkExterno = async (req, res) => {
 
 exports.adicionarProducao = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
-    const { titulo, descricao, link_externo, data_publicacao, projeto_id } = req.body;
+    const { titulo, descricao, link_externo, data_publicacao, projeto_id, tipo } = req.body;
+    const tiposValidos = ['Feira', 'Podcast', 'Livro', 'Animacoes'];
+    if (!tiposValidos.includes(tipo)) return res.status(400).send('Tipo de produção inválido');
     try {
-        await pool.query('INSERT INTO producoes (titulo, descricao, link_externo, data_publicacao, projeto_id, modificado_em, modificado_por) VALUES ($1, $2, $3, $4, $5, NOW(), $6)', [titulo, descricao, link_externo, data_publicacao, projeto_id, req.session.userEmail]);
+        const inserida = await pool.query('INSERT INTO producoes (titulo, descricao, link_externo, data_publicacao, projeto_id, modificado_em, modificado_por) VALUES ($1, $2, $3, $4, $5, NOW(), $6) RETURNING id', [titulo, descricao, link_externo, data_publicacao, projeto_id, req.session.userEmail]);
+        conteudoMetadata.salvarTipoProducao(inserida.rows[0].id, tipo);
         res.redirect('/admin/producoes?sucesso=true');
     } catch (err) {
         console.error(err);
@@ -237,7 +286,9 @@ exports.adicionarFeira = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     const { titulo, descricao, ano, link_externo, projeto_id } = req.body;
     try {
-        await pool.query('INSERT INTO feiras (titulo, descricao, ano, link_externo, projeto_id, modificado_em, modificado_por) VALUES ($1, $2, $3, $4, $5, NOW(), $6)', [titulo, descricao, ano, link_externo, projeto_id, req.session.userEmail]);
+        const inserida = await pool.query('INSERT INTO feiras (titulo, descricao, ano, link_externo, projeto_id, modificado_em, modificado_por) VALUES ($1, $2, $3, $4, $5, NOW(), $6) RETURNING id', [titulo, descricao, ano, link_externo, projeto_id, req.session.userEmail]);
+        const imagens = (req.files || []).map(file => '/uploads/' + file.filename);
+        if (imagens.length) conteudoMetadata.adicionarImagensFeira(inserida.rows[0].id, imagens);
         res.redirect('/admin/feiras?sucesso=true');
     } catch (err) {
         console.error(err);
@@ -438,9 +489,12 @@ exports.alterarLinkExterno = async (req, res) => {
 exports.alterarProducao = async (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     const { id } = req.params;
-    const { titulo, descricao, link_externo, data_publicacao, projeto_id } = req.body;
+    const { titulo, descricao, link_externo, data_publicacao, projeto_id, tipo } = req.body;
+    const tiposValidos = ['Feira', 'Podcast', 'Livro', 'Animacoes'];
+    if (!tiposValidos.includes(tipo)) return res.status(400).send('Tipo de produção inválido');
     try {
         await pool.query('UPDATE producoes SET titulo = $1, descricao = $2, link_externo = $3, data_publicacao = $4, projeto_id = $5, modificado_em = NOW(), modificado_por = $6 WHERE id = $7', [titulo, descricao, link_externo, data_publicacao, projeto_id, req.session.userEmail, id]);
+        conteudoMetadata.salvarTipoProducao(id, tipo);
         res.redirect('/admin/producoes?sucesso=alterado');
     } catch (err) {
         console.error(err);
@@ -467,6 +521,8 @@ exports.alterarFeira = async (req, res) => {
     const { titulo, descricao, ano, link_externo, projeto_id } = req.body;
     try {
         await pool.query('UPDATE feiras SET titulo = $1, descricao = $2, ano = $3, link_externo = $4, projeto_id = $5, modificado_em = NOW(), modificado_por = $6 WHERE id = $7', [titulo, descricao, ano, link_externo, projeto_id, req.session.userEmail, id]);
+        const imagens = (req.files || []).map(file => '/uploads/' + file.filename);
+        if (imagens.length) conteudoMetadata.adicionarImagensFeira(id, imagens);
         res.redirect('/admin/feiras?sucesso=alterado');
     } catch (err) {
         console.error(err);
