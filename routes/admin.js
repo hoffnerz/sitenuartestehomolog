@@ -29,6 +29,7 @@ router.get('/feiras', adminController.renderFeirasAdmin);
 router.get('/editais', adminController.renderEditaisAdmin);
 router.get('/noticias', adminController.renderNoticiasAdmin);
 router.get('/equipe', adminController.renderEquipeAdmin);
+router.get('/estatisticas/exportar.csv', adminController.exportarEstatisticas);
 router.get('/estatisticas', adminController.renderEstatisticas);
 router.get('/pagina-inicial', adminController.renderPaginaInicialAdmin);
 

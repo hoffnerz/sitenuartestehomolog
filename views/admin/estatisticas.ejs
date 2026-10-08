@@ -1,120 +1,70 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/admin.css">
-
 <style>
-    .stats-chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-    .stats-chart-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); padding: 1.25rem; }
-    .stats-chart-card h3 { margin: 0 0 1rem; color: var(--color-primary); font-size: 1.05rem; font-weight: 700; }
-    .stats-bars { display: flex; align-items: flex-end; gap: .45rem; min-height: 12rem; padding: 1rem .25rem 0; border-bottom: 1px solid var(--color-border); }
-    .stats-bar-column { display: flex; flex: 1; min-width: 0; height: 11rem; flex-direction: column; align-items: center; justify-content: flex-end; gap: .35rem; }
-    .stats-bar-value { color: var(--color-primary); font-size: .7rem; font-weight: 700; }
-    .stats-bar { width: 100%; max-width: 1.4rem; min-height: .2rem; border-radius: .4rem .4rem 0 0; background: linear-gradient(180deg, var(--color-accent), var(--color-primary-light)); }
-    .stats-bar-label { width: 2.5rem; overflow: hidden; color: var(--color-text-muted); font-size: .65rem; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
-    .stats-ranking { display: flex; flex-direction: column; gap: .9rem; }
-    .stats-ranking-row { display: grid; grid-template-columns: minmax(0, 1fr) 3rem; gap: .7rem; align-items: center; }
-    .stats-ranking-title { overflow: hidden; color: var(--color-text); font-size: .85rem; text-overflow: ellipsis; white-space: nowrap; }
-    .stats-ranking-total { color: var(--color-primary); font-size: .8rem; font-weight: 700; text-align: right; }
-    .stats-ranking-track { grid-column: 1 / -1; height: .45rem; overflow: hidden; border-radius: 999px; background: var(--color-bg-alt); }
-    .stats-ranking-fill { height: 100%; border-radius: inherit; background: var(--color-accent); }
-    .stats-empty { color: var(--color-text-muted); font-size: .9rem; }
+    .stats-page-intro{color:var(--color-text-muted);margin-top:.35rem}
+    .stats-filter{display:flex;align-items:end;flex-wrap:wrap;gap:1rem;padding:1.25rem;margin:1.5rem 0;background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:var(--radius-lg)}
+    .stats-filter .admin-field{min-width:10rem;flex:1}.stats-filter__actions{display:flex;gap:.65rem;flex-wrap:wrap}
+    .stats-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:1rem;margin:1.5rem 0 2rem}
+    .stats-kpi{padding:1.25rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+    .stats-kpi__label{display:block;margin-bottom:.45rem;color:var(--color-text-muted);font-size:.82rem;font-weight:600}
+    .stats-kpi__value{color:var(--color-primary);font-size:1.8rem;font-weight:800;line-height:1.15}
+    .stats-chart-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;margin:1.5rem 0}
+    @media(min-width:1100px){.stats-chart-grid--two{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .stats-chart-card{min-width:0;padding:1.25rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm)}
+    .stats-chart-card h3{margin:0 0 1rem;color:var(--color-primary);font-size:1.05rem;font-weight:700}
+    .stats-bars-wrap{overflow-x:auto;border-bottom:1px solid var(--color-border)}
+    .stats-bars{display:flex;align-items:flex-end;gap:.45rem;min-width:max-content;min-height:13rem;padding:1rem .25rem 0}
+    .stats-bar-column{display:flex;flex:0 0 1.65rem;height:11.5rem;flex-direction:column;align-items:center;justify-content:flex-end;gap:.35rem}
+    .stats-bar-value{color:var(--color-primary);font-size:.68rem;font-weight:700}
+    .stats-bar{width:100%;max-width:1.35rem;min-height:.18rem;border-radius:.4rem .4rem 0 0;background:linear-gradient(180deg,var(--color-accent),var(--color-primary-light))}
+    .stats-bar-label{width:2.7rem;overflow:hidden;color:var(--color-text-muted);font-size:.65rem;text-align:center;text-overflow:ellipsis;white-space:nowrap}
+    .stats-ranking{display:grid;gap:.9rem}
+    .stats-ranking-row{display:grid;grid-template-columns:minmax(0,1fr) 3rem;gap:.35rem .7rem;align-items:center}
+    .stats-ranking-title{overflow:hidden;color:var(--color-text);font-size:.87rem;text-overflow:ellipsis;white-space:nowrap}
+    .stats-ranking-total{color:var(--color-primary);font-size:.82rem;font-weight:700;text-align:right}
+    .stats-ranking-track{grid-column:1/-1;height:.45rem;overflow:hidden;border-radius:999px;background:var(--color-bg-alt)}
+    .stats-ranking-fill{height:100%;border-radius:inherit;background:var(--color-accent)}
+    .stats-empty{padding:1.25rem 0;color:var(--color-text-muted);font-size:.9rem}
+    .stats-data-table{width:100%;border-collapse:collapse;text-align:left}.stats-data-table th,.stats-data-table td{padding:.8rem .65rem;border-bottom:1px solid var(--color-border)}
+    .stats-data-table th{color:var(--color-text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.03em}.stats-data-table td:last-child,.stats-data-table th:last-child{text-align:right}
+    .stats-footnote{margin-top:1.25rem;color:var(--color-text-muted);font-size:.8rem}
 </style>
-
-<section class="admin-page">
+<section class="admin-page animate-on-scroll">
     <div class="admin-shell">
-        <div class="admin-topbar">
-            <span class="admin-topbar__title">Painel NuAR</span>
-            <button type="button" id="adminSidebarOpenBtn" class="admin-topbar__toggle">Menu</button>
-        </div>
-
+        <div class="admin-topbar"><span class="admin-topbar__title">Painel NuAR</span><button type="button" id="adminSidebarOpenBtn" class="admin-topbar__toggle">Menu</button></div>
         <%- include('../_admin_sidebar.ejs') %>
-
-        <main class="admin-main">
-            <div class="admin-card">
-                <div class="admin-page-header">
-                    <div>
-                        <span class="admin-page-header__eyebrow">Painel de administração</span>
-                        <h2 class="admin-page-header__title">Cliques em links externos</h2>
-                        <p class="admin-page-header__count">Período de <%= inicio %> a <%= fim %></p>
-                    </div>
-                </div>
-
-                <div class="admin-form-panel">
-                    <p class="admin-hint">Resumo automático dos últimos 30 dias. Os arquivos antigos são removidos conforme a política de retenção.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
-                    <div class="admin-card admin-stat-card">
-                        <span class="admin-page-header__eyebrow">Total no período</span>
-                        <strong class="admin-page-header__title"><%= totalCliques %></strong>
-                        <span class="admin-hint">cliques registrados</span>
-                    </div>
-                    <div class="admin-card admin-stat-card">
-                        <span class="admin-page-header__eyebrow">Links com cliques</span>
-                        <strong class="admin-page-header__title"><%= linksMaisClicados.length %></strong>
-                        <span class="admin-hint">no ranking exibido</span>
-                    </div>
-                    <div class="admin-card admin-stat-card">
-                        <span class="admin-page-header__eyebrow">Retenção</span>
-                        <strong class="admin-page-header__title">180 dias</strong>
-                    </div>
-                </div>
-
-                <% const maxDia = Math.max(...cliquesPorDia.map(item => item.total), 1); %>
-                <% const maxLink = Math.max(...linksMaisClicados.map(item => item.total), 1); %>
-                <div class="stats-chart-grid">
-                    <section class="stats-chart-card" aria-labelledby="chart-dias-title">
-                        <h3 id="chart-dias-title">Cliques por dia</h3>
-                        <% if (cliquesPorDia.every(item => item.total === 0)) { %>
-                            <p class="stats-empty">Ainda não há cliques registrados nesse período.</p>
-                        <% } else { %>
-                            <div class="stats-bars" role="img" aria-label="Gráfico de cliques por dia">
-                                <% cliquesPorDia.forEach(item => { %>
-                                    <div class="stats-bar-column" title="<%= item.dia %>: <%= item.total %> clique(s)">
-                                        <span class="stats-bar-value"><%= item.total || '' %></span>
-                                        <div class="stats-bar" style="height: <%= Math.max((item.total / maxDia) * 100, item.total ? 4 : 0) %>%"></div>
-                                        <span class="stats-bar-label"><%= item.dia.slice(5).split('-').reverse().join('/') %></span>
-                                    </div>
-                                <% }); %>
-                            </div>
-                        <% } %>
-                    </section>
-
-                    <section class="stats-chart-card" aria-labelledby="chart-links-title">
-                        <h3 id="chart-links-title">Ranking de links</h3>
-                        <% if (linksMaisClicados.length === 0) { %>
-                            <p class="stats-empty">Nenhum link recebeu cliques nesse período.</p>
-                        <% } else { %>
-                            <div class="stats-ranking" role="img" aria-label="Ranking dos links mais clicados">
-                                <% linksMaisClicados.forEach(item => { %>
-                                    <div class="stats-ranking-row" title="<%= item.nome %>: <%= item.total %> clique(s)">
-                                        <span class="stats-ranking-title"><%= item.nome %></span>
-                                        <span class="stats-ranking-total"><%= item.total %></span>
-                                        <div class="stats-ranking-track"><div class="stats-ranking-fill" style="width: <%= (item.total / maxLink) * 100 %>%"></div></div>
-                                    </div>
-                                <% }); %>
-                            </div>
-                        <% } %>
-                    </section>
-                </div>
-
-                <div class="admin-section-heading">
-                    <h4 class="admin-section-heading__title">Detalhamento por link</h4>
-                </div>
-                <% if (linksMaisClicados.length === 0) { %>
-                    <p class="admin-hint">Ainda não há cliques registrados nesse período.</p>
-                <% } else { %>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead><tr><th class="py-3 pr-4">Link</th><th class="py-3">Cliques</th></tr></thead>
-                            <tbody>
-                                <% linksMaisClicados.forEach(item => { %>
-                                    <tr class="border-t border-gray-100"><td class="py-3 pr-4 font-medium"><%= item.nome %></td><td class="py-3"><%= item.total %></td></tr>
-                                <% }); %>
-                            </tbody>
-                        </table>
-                    </div>
-                <% } %>
+        <main class="admin-main"><div class="admin-card">
+            <div class="admin-page-header"><div><span class="admin-page-header__eyebrow">Painel de administração</span><h2 class="admin-page-header__title">Estatísticas do site</h2><p class="stats-page-intro">Desempenho de <%= inicio %> a <%= fim %></p></div></div>
+            <form class="stats-filter" method="GET" action="/admin/estatisticas">
+                <div class="admin-field"><label for="stats-inicio">Data inicial</label><input class="admin-input" type="date" id="stats-inicio" name="inicio" value="<%= inicio %>" required></div>
+                <div class="admin-field"><label for="stats-fim">Data final</label><input class="admin-input" type="date" id="stats-fim" name="fim" value="<%= fim %>" required></div>
+                <div class="stats-filter__actions"><button class="admin-btn admin-btn--primary" type="submit">Aplicar período</button><a class="admin-btn admin-btn--edit" href="/admin/estatisticas/exportar.csv?inicio=<%= inicio %>&fim=<%= fim %>">Baixar CSV</a></div>
+            </form>
+            <div class="stats-kpis">
+                <div class="stats-kpi"><span class="stats-kpi__label">Visualizações de página</span><strong class="stats-kpi__value"><%= totalVisualizacoes.toLocaleString('pt-BR') %></strong></div>
+                <div class="stats-kpi"><span class="stats-kpi__label">Sessões estimadas</span><strong class="stats-kpi__value"><%= sessoesEstimadas.toLocaleString('pt-BR') %></strong></div>
+                <div class="stats-kpi"><span class="stats-kpi__label">Cliques em links VOX</span><strong class="stats-kpi__value"><%= totalCliques.toLocaleString('pt-BR') %></strong></div>
+                <div class="stats-kpi"><span class="stats-kpi__label">Páginas com acesso</span><strong class="stats-kpi__value"><%= paginasComAcesso.toLocaleString('pt-BR') %></strong></div>
             </div>
-        </main>
+            <% const maxViews=Math.max(...visualizacoesPorDia.map(i=>i.visualizacoes),1); const maxClicks=Math.max(...visualizacoesPorDia.map(i=>i.cliques),1); const maxPage=Math.max(...paginasMaisVisitadas.map(i=>i.total),1); const maxLink=Math.max(...linksMaisClicados.map(i=>i.total),1); %>
+            <div class="stats-chart-grid stats-chart-grid--two">
+                <section class="stats-chart-card" aria-labelledby="stats-views-title"><h3 id="stats-views-title">Visualizações por dia</h3>
+                    <% if (totalVisualizacoes===0) { %><p class="stats-empty">Ainda não há visualizações registradas nesse período.</p><% } else { %><div class="stats-bars-wrap"><div class="stats-bars" role="img" aria-label="Gráfico diário de visualizações"><% visualizacoesPorDia.forEach(item=>{ %><div class="stats-bar-column" title="<%= item.dia %>: <%= item.visualizacoes %> visualização(ões)"><span class="stats-bar-value"><%= item.visualizacoes||'' %></span><div class="stats-bar" style="height:<%= Math.max(item.visualizacoes/maxViews*100,item.visualizacoes?3:0) %>%"></div><span class="stats-bar-label"><%= item.dia.slice(5).split('-').reverse().join('/') %></span></div><% }) %></div></div><% } %>
+                </section>
+                <section class="stats-chart-card" aria-labelledby="stats-clicks-title"><h3 id="stats-clicks-title">Cliques externos por dia</h3>
+                    <% if (totalCliques===0) { %><p class="stats-empty">Ainda não há cliques registrados nesse período.</p><% } else { %><div class="stats-bars-wrap"><div class="stats-bars" role="img" aria-label="Gráfico diário de cliques externos"><% visualizacoesPorDia.forEach(item=>{ %><div class="stats-bar-column" title="<%= item.dia %>: <%= item.cliques %> clique(s)"><span class="stats-bar-value"><%= item.cliques||'' %></span><div class="stats-bar" style="height:<%= Math.max(item.cliques/maxClicks*100,item.cliques?3:0) %>%"></div><span class="stats-bar-label"><%= item.dia.slice(5).split('-').reverse().join('/') %></span></div><% }) %></div></div><% } %>
+                </section>
+            </div>
+            <div class="stats-chart-grid stats-chart-grid--two">
+                <section class="stats-chart-card"><h3>Páginas mais visitadas</h3><% if(!paginasMaisVisitadas.length){ %><p class="stats-empty">Ainda não há páginas visitadas no período.</p><% } else { %><div class="stats-ranking"><% paginasMaisVisitadas.forEach(item=>{ %><div class="stats-ranking-row" title="<%= item.nome %>: <%= item.total %>"><span class="stats-ranking-title"><%= item.nome %></span><span class="stats-ranking-total"><%= item.total %></span><div class="stats-ranking-track"><div class="stats-ranking-fill" style="width:<%= item.total/maxPage*100 %>%"></div></div></div><% }) %></div><% } %></section>
+                <section class="stats-chart-card"><h3>Links mais clicados</h3><% if(!linksMaisClicados.length){ %><p class="stats-empty">Ainda não há cliques em links externos no período.</p><% } else { %><div class="stats-ranking"><% linksMaisClicados.forEach(item=>{ %><div class="stats-ranking-row" title="<%= item.nome %>: <%= item.total %>"><span class="stats-ranking-title"><%= item.nome %></span><span class="stats-ranking-total"><%= item.total %></span><div class="stats-ranking-track"><div class="stats-ranking-fill" style="width:<%= item.total/maxLink*100 %>%"></div></div></div><% }) %></div><% } %></section>
+            </div>
+            <div class="stats-chart-grid stats-chart-grid--two">
+                <section class="stats-chart-card"><h3>Visualizações por país</h3><% if(!visitasPorPais.length){ %><p class="stats-empty">Sem dados de localização de cliques nesse intervalo.</p><% } else { %><div class="overflow-x-auto"><table class="stats-data-table"><thead><tr><th>País</th><th>Visualizações</th></tr></thead><tbody><% visitasPorPais.forEach(i=>{ %><tr><td><%= i.nome %></td><td><%= i.total %></td></tr><% }) %></tbody></table></div><% } %></section>
+                <section class="stats-chart-card"><h3>Visualizações por cidade</h3><% if(!visitasPorCidade.length){ %><p class="stats-empty">Sem dados de localização de cliques nesse intervalo.</p><% } else { %><div class="overflow-x-auto"><table class="stats-data-table"><thead><tr><th>Cidade</th><th>Visualizações</th></tr></thead><tbody><% visitasPorCidade.forEach(i=>{ %><tr><td><%= i.nome %></td><td><%= i.total %></td></tr><% }) %></tbody></table></div><% } %></section>
+            </div>
+            <p class="stats-footnote">As estatísticas são armazenadas em arquivos locais, sem gravar IP ou alterar o banco. Sessões são estimativas baseadas em identificadores anonimizados. Retenção atual: <%= retencaoDias %> dias.</p>
+        </div></main>
     </div>
 </section>
+<script src="/admin.js"></script>

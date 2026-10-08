@@ -1,52 +1,105 @@
 <%- include('../header.ejs') %>
 <link rel="stylesheet" href="/admin.css">
+<style>
+    .home-edit-section { margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-xl); background: var(--color-surface); box-shadow: var(--shadow-sm); }
+    .home-edit-section__intro { color: var(--color-text-muted); margin: .35rem 0 1.25rem; }
+    .home-image-list { display: grid; grid-template-columns: repeat(auto-fill,minmax(13rem,1fr)); gap: 1rem; }
+    .home-image-item { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-bg); }
+    .home-image-item img { display: block; width: 100%; height: 9rem; object-fit: cover; background: var(--color-bg-alt); }
+    .home-image-item__actions { display:flex; align-items:center; gap:.4rem; padding:.65rem; }
+    .home-icon-button { display:inline-flex; align-items:center; justify-content:center; min-width:2.25rem; min-height:2.25rem; border:1px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-surface); color:var(--color-primary); font-weight:700; cursor:pointer; }
+    .home-icon-button:hover { background:var(--color-bg-alt); }
+    .home-icon-button--delete { margin-left:auto; color:#b42318; }
+    .home-image-name { overflow:hidden; padding:0 .65rem .6rem; color:var(--color-text-muted); font-size:.75rem; text-overflow:ellipsis; white-space:nowrap; }
+    .home-timeline-list { display:grid; gap:1rem; }
+    .home-timeline-item { padding:1.1rem; border:1px solid var(--color-border); border-radius:var(--radius-lg); background:var(--color-bg); }
+    .home-timeline-item__header { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.8rem; }
+    .home-timeline-item__title { color:var(--color-primary); font-weight:700; }
+    .home-edit-actions { display:flex; justify-content:flex-end; gap:.75rem; margin-top:1.5rem; }
+    .home-file-input { display:block; width:100%; margin:1rem 0; }
+    @media(max-width:640px){ .home-edit-section{padding:1rem;} .home-edit-actions{flex-direction:column;} .home-edit-actions .admin-btn{justify-content:center;} }
+</style>
 <section class="admin-page animate-on-scroll">
     <div class="admin-shell">
         <div class="admin-topbar"><span class="admin-topbar__title">Painel NuAR</span><button type="button" id="adminSidebarOpenBtn" class="admin-topbar__toggle">Menu</button></div>
         <%- include('../_admin_sidebar.ejs') %>
         <main class="admin-main">
             <div class="admin-card">
-                <div class="admin-page-header"><div><span class="admin-page-header__eyebrow">Painel de administração</span><h2 class="admin-page-header__title">Página inicial</h2><p class="admin-page-header__count">Edite os textos e as imagens exibidos na página principal.</p></div></div>
+                <div class="admin-page-header"><div><span class="admin-page-header__eyebrow">Painel de administração</span><h2 class="admin-page-header__title">Editar página inicial</h2><p class="admin-page-header__count">Gerencie o destaque, as imagens, a linha do tempo e os cartões institucionais.</p></div></div>
                 <% if (sucesso) { %><div class="admin-alert admin-alert--success"><span>Conteúdo da página inicial salvo com sucesso.</span></div><% } %>
-                <form action="/admin/pagina-inicial" method="POST" enctype="multipart/form-data">
+                <form id="form-homepage" action="/admin/pagina-inicial" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <div class="admin-section-heading"><h3 class="admin-section-heading__title">Destaque principal</h3></div>
-                    <div class="admin-form-grid">
-                        <div class="admin-field"><label>Etiqueta superior</label><input class="admin-input" name="hero_etiqueta" value="<%= homepage.hero.etiqueta %>"></div>
-                        <div class="admin-field admin-field--full"><label>Título (quebras de linha são mantidas)</label><textarea class="admin-textarea" name="hero_titulo" rows="3"><%= homepage.hero.titulo %></textarea></div>
-                        <div class="admin-field admin-field--full"><label>Descrição</label><textarea class="admin-textarea" name="hero_descricao" rows="4"><%= homepage.hero.descricao %></textarea></div>
-                        <div class="admin-field"><label>Texto do botão 1</label><input class="admin-input" name="hero_botao1Texto" value="<%= homepage.hero.botao1Texto %>"></div>
-                        <div class="admin-field"><label>Link do botão 1</label><input class="admin-input" name="hero_botao1Url" value="<%= homepage.hero.botao1Url %>"></div>
-                        <div class="admin-field"><label>Texto do botão 2</label><input class="admin-input" name="hero_botao2Texto" value="<%= homepage.hero.botao2Texto %>"></div>
-                        <div class="admin-field"><label>Link do botão 2</label><input class="admin-input" name="hero_botao2Url" value="<%= homepage.hero.botao2Url %>"></div>
-                        <div class="admin-field admin-field--full"><label>Imagens do carrossel (selecionar arquivos substitui as atuais)</label><input class="admin-input" type="file" name="homepage_imagens" accept="image/jpeg,image/png,image/webp,image/gif" multiple><small>JPG, PNG, WEBP ou GIF; até 12 imagens por envio, 5 MB cada.</small><div class="flex gap-3 flex-wrap mt-3"><% homepage.hero.imagens.forEach(src => { %><img src="<%= src %>" alt="Imagem atual do destaque" width="110" height="70" class="object-cover rounded"><% }) %></div></div>
-                    </div>
-                    <div class="admin-section-heading"><h3 class="admin-section-heading__title">Linha do tempo</h3></div>
-                    <div class="admin-form-grid">
-                        <div class="admin-field"><label>Subtítulo</label><input class="admin-input" name="timeline_subtitulo" value="<%= homepage.timelineSubtitulo %>"></div>
-                        <div class="admin-field"><label>Título</label><input class="admin-input" name="timeline_titulo" value="<%= homepage.timelineTitulo %>"></div>
-                        <% homepage.timeline.forEach((item, i) => { %>
-                        <div class="admin-field"><label>Ano / marco <%= i + 1 %></label><input class="admin-input" name="timeline_ano_<%= i %>" value="<%= item.ano %>"></div>
-                        <div class="admin-field"><label>Texto do marco <%= i + 1 %></label><textarea class="admin-textarea" name="timeline_texto_<%= i %>" rows="3"><%= item.texto %></textarea></div>
-                        <% }) %>
-                    </div>
-                    <div class="admin-section-heading"><h3 class="admin-section-heading__title">Informações institucionais</h3></div>
-                    <div class="admin-form-grid">
-                        <div class="admin-field"><label>Subtítulo</label><input class="admin-input" name="institucional_subtitulo" value="<%= homepage.institucionalSubtitulo %>"></div>
-                        <div class="admin-field"><label>Título</label><input class="admin-input" name="institucional_titulo" value="<%= homepage.institucionalTitulo %>"></div>
-                        <% homepage.institucional.forEach((item, i) => { %>
-                        <div class="admin-field admin-field--full"><h4>Cartão institucional <%= i + 1 %></h4></div>
-                        <div class="admin-field"><label>Título do cartão</label><input class="admin-input" name="inst_titulo_<%= i %>" value="<%= item.titulo %>"></div>
-                        <div class="admin-field"><label>Texto do botão</label><input class="admin-input" name="inst_botao_<%= i %>" value="<%= item.botao %>"></div>
-                        <div class="admin-field admin-field--full"><label>Descrição</label><textarea class="admin-textarea" name="inst_texto_<%= i %>" rows="4"><%= item.texto %></textarea></div>
-                        <div class="admin-field admin-field--full"><label>Link</label><input class="admin-input" name="inst_url_<%= i %>" value="<%= item.url %>"></div>
-                        <% }) %>
-                    </div>
-                    <div class="admin-form-actions"><button type="submit" class="admin-btn admin-btn--primary">Salvar página inicial</button></div>
+                    <input type="hidden" name="homepage_image_order" id="homepage-image-order">
+                    <input type="hidden" name="timeline_count" id="timeline-count" value="<%= homepage.timeline.length %>">
+                    <section class="home-edit-section">
+                        <div class="admin-section-heading"><h3 class="admin-section-heading__title">Destaque principal</h3></div>
+                        <p class="home-edit-section__intro">Textos, links dos botões e galeria exibidos no primeiro bloco do site.</p>
+                        <div class="admin-form-grid">
+                            <div class="admin-field"><label for="hero_etiqueta">Etiqueta superior</label><input id="hero_etiqueta" class="admin-input" name="hero_etiqueta" value="<%= homepage.hero.etiqueta %>"></div>
+                            <div class="admin-field admin-field--full"><label for="hero_titulo">Título <span class="admin-hint">(use uma linha por quebra de linha)</span></label><textarea id="hero_titulo" class="admin-textarea" name="hero_titulo" rows="3"><%= homepage.hero.titulo %></textarea></div>
+                            <div class="admin-field admin-field--full"><label for="hero_descricao">Descrição</label><textarea id="hero_descricao" class="admin-textarea" name="hero_descricao" rows="4"><%= homepage.hero.descricao %></textarea></div>
+                            <div class="admin-field"><label for="hero_botao1Texto">Texto do botão 1</label><input id="hero_botao1Texto" class="admin-input" name="hero_botao1Texto" value="<%= homepage.hero.botao1Texto %>"></div>
+                            <div class="admin-field"><label for="hero_botao1Url">Link do botão 1</label><input id="hero_botao1Url" class="admin-input" name="hero_botao1Url" value="<%= homepage.hero.botao1Url %>"></div>
+                            <div class="admin-field"><label for="hero_botao2Texto">Texto do botão 2</label><input id="hero_botao2Texto" class="admin-input" name="hero_botao2Texto" value="<%= homepage.hero.botao2Texto %>"></div>
+                            <div class="admin-field"><label for="hero_botao2Url">Link do botão 2</label><input id="hero_botao2Url" class="admin-input" name="hero_botao2Url" value="<%= homepage.hero.botao2Url %>"></div>
+                        </div>
+                        <div class="admin-section-heading"><h4 class="admin-section-heading__title">Imagens do carrossel</h4></div>
+                        <p class="home-edit-section__intro">Novas imagens são acrescentadas. Use as setas para reordenar ou remova cada foto individualmente.</p>
+                        <label class="admin-btn admin-btn--edit" for="homepage_imagens">Adicionar imagens</label>
+                        <input class="home-file-input" id="homepage_imagens" type="file" name="homepage_imagens" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+                        <small class="admin-hint">JPG, PNG, WEBP ou GIF; até 12 imagens por envio, 5 MB cada.</small>
+                        <div id="homepage-image-list" class="home-image-list mt-4">
+                            <% homepage.hero.imagens.forEach(src => { %>
+                            <article class="home-image-item" data-kind="existing" data-src="<%= src %>">
+                                <img src="<%= src %>" alt="Imagem atual do destaque"><div class="home-image-name"><%= src.split('/').pop() %></div>
+                                <div class="home-image-item__actions"><button type="button" class="home-icon-button" data-move="up" aria-label="Mover imagem para cima">↑</button><button type="button" class="home-icon-button" data-move="down" aria-label="Mover imagem para baixo">↓</button><button type="button" class="home-icon-button home-icon-button--delete" data-remove-image aria-label="Remover imagem">Remover</button></div>
+                            </article>
+                            <% }) %>
+                        </div>
+                    </section>
+                    <section class="home-edit-section">
+                        <div class="admin-section-heading"><h3 class="admin-section-heading__title">Linha do tempo</h3></div>
+                        <p class="home-edit-section__intro">Adicione ou remova marcos; cada bloco contém um ano e sua descrição.</p>
+                        <div class="admin-form-grid mb-6"><div class="admin-field"><label for="timeline_subtitulo">Subtítulo</label><input id="timeline_subtitulo" class="admin-input" name="timeline_subtitulo" value="<%= homepage.timelineSubtitulo %>"></div><div class="admin-field"><label for="timeline_titulo">Título da seção</label><input id="timeline_titulo" class="admin-input" name="timeline_titulo" value="<%= homepage.timelineTitulo %>"></div></div>
+                        <div id="timeline-list" class="home-timeline-list">
+                            <% homepage.timeline.forEach((item, i) => { %>
+                            <article class="home-timeline-item" data-timeline-item><div class="home-timeline-item__header"><span class="home-timeline-item__title">Marco <%= i + 1 %></span><button type="button" class="admin-btn admin-btn--danger admin-btn--sm" data-remove-timeline>Remover marco</button></div>
+                                <div class="admin-form-grid"><div class="admin-field"><label>Ano</label><input class="admin-input" data-field="ano" name="timeline_ano_<%= i %>" value="<%= item.ano %>"></div><div class="admin-field admin-field--full"><label>Descrição</label><textarea class="admin-textarea" data-field="texto" name="timeline_texto_<%= i %>" rows="3"><%= item.texto %></textarea></div></div>
+                            </article><% }) %>
+                        </div>
+                        <button type="button" id="add-timeline-item" class="admin-btn admin-btn--edit mt-4">+ Adicionar marco</button>
+                    </section>
+                    <section class="home-edit-section">
+                        <div class="admin-section-heading"><h3 class="admin-section-heading__title">Informações institucionais</h3></div>
+                        <p class="home-edit-section__intro">Edite os dois cartões e seus links na parte inferior da página inicial.</p>
+                        <div class="admin-form-grid mb-6"><div class="admin-field"><label for="institucional_subtitulo">Subtítulo</label><input id="institucional_subtitulo" class="admin-input" name="institucional_subtitulo" value="<%= homepage.institucionalSubtitulo %>"></div><div class="admin-field"><label for="institucional_titulo">Título da seção</label><input id="institucional_titulo" class="admin-input" name="institucional_titulo" value="<%= homepage.institucionalTitulo %>"></div></div>
+                        <div class="admin-form-grid">
+                            <% homepage.institucional.forEach((item, i) => { %>
+                            <div class="admin-field admin-field--full"><h4 class="admin-section-heading__title">Cartão <%= i + 1 %></h4></div><div class="admin-field"><label>Título</label><input class="admin-input" name="inst_titulo_<%= i %>" value="<%= item.titulo %>"></div><div class="admin-field"><label>Texto do botão</label><input class="admin-input" name="inst_botao_<%= i %>" value="<%= item.botao %>"></div><div class="admin-field admin-field--full"><label>Descrição</label><textarea class="admin-textarea" name="inst_texto_<%= i %>" rows="4"><%= item.texto %></textarea></div><div class="admin-field admin-field--full"><label>Link</label><input class="admin-input" name="inst_url_<%= i %>" value="<%= item.url %>"></div>
+                            <% }) %>
+                        </div>
+                    </section>
+                    <div class="home-edit-actions"><button type="submit" class="admin-btn admin-btn--primary">Salvar alterações</button></div>
                 </form>
             </div>
         </main>
     </div>
 </section>
+<template id="timeline-item-template"><article class="home-timeline-item" data-timeline-item><div class="home-timeline-item__header"><span class="home-timeline-item__title">Novo marco</span><button type="button" class="admin-btn admin-btn--danger admin-btn--sm" data-remove-timeline>Remover marco</button></div><div class="admin-form-grid"><div class="admin-field"><label>Ano</label><input class="admin-input" data-field="ano"></div><div class="admin-field admin-field--full"><label>Descrição</label><textarea class="admin-textarea" data-field="texto" rows="3"></textarea></div></div></article></template>
+<script>
+(() => {
+    const form=document.getElementById('form-homepage'), imageList=document.getElementById('homepage-image-list'), fileInput=document.getElementById('homepage_imagens'), orderField=document.getElementById('homepage-image-order');
+    let pendingFiles=[];
+    function imageCard(src,index){const card=document.createElement('article');card.className='home-image-item';card.dataset.kind='new';card.dataset.fileIndex=String(index);const img=document.createElement('img');img.alt='Nova imagem do destaque';img.src=src;const name=document.createElement('div');name.className='home-image-name';name.textContent=pendingFiles[index].name;const actions=document.createElement('div');actions.className='home-image-item__actions';actions.innerHTML='<button type="button" class="home-icon-button" data-move="up" aria-label="Mover imagem para cima">↑</button><button type="button" class="home-icon-button" data-move="down" aria-label="Mover imagem para baixo">↓</button><button type="button" class="home-icon-button home-icon-button--delete" data-remove-image aria-label="Remover imagem">Remover</button>';card.append(img,name,actions);return card;}
+    function applyFileList(){const transfer=new DataTransfer();pendingFiles.forEach(file=>transfer.items.add(file));fileInput.files=transfer.files;}
+    fileInput.addEventListener('change',()=>{const added=Array.from(fileInput.files||[]);pendingFiles.push(...added);applyFileList();const start=pendingFiles.length-added.length;added.forEach((file,index)=>imageList.appendChild(imageCard(URL.createObjectURL(file),start+index)));});
+    imageList.addEventListener('click',event=>{const remove=event.target.closest('[data-remove-image]');if(remove){const card=remove.closest('.home-image-item');if(card.dataset.kind==='new'){pendingFiles.splice(Number(card.dataset.fileIndex),1);card.remove();imageList.querySelectorAll('[data-kind="new"]').forEach((el,i)=>el.dataset.fileIndex=String(i));applyFileList();}else card.remove();return;}const move=event.target.closest('[data-move]');if(move){const card=move.closest('.home-image-item'),sibling=move.dataset.move==='up'?card.previousElementSibling:card.nextElementSibling;if(!sibling)return;if(move.dataset.move==='up')imageList.insertBefore(card,sibling);else imageList.insertBefore(sibling,card);const novos=Array.from(imageList.querySelectorAll('[data-kind="new"]'));pendingFiles=novos.map(item=>pendingFiles[Number(item.dataset.fileIndex)]);novos.forEach((item,i)=>item.dataset.fileIndex=String(i));applyFileList();}});
+    const timelineList=document.getElementById('timeline-list'),countField=document.getElementById('timeline-count');
+    function reindexTimeline(){timelineList.querySelectorAll('[data-timeline-item]').forEach((item,i)=>{item.querySelector('.home-timeline-item__title').textContent=`Marco ${i+1}`;item.querySelector('[data-field="ano"]').name=`timeline_ano_${i}`;item.querySelector('[data-field="texto"]').name=`timeline_texto_${i}`;});}
+    document.getElementById('add-timeline-item').addEventListener('click',()=>{timelineList.appendChild(document.getElementById('timeline-item-template').content.cloneNode(true));reindexTimeline();timelineList.lastElementChild.querySelector('[data-field="ano"]').focus();});
+    timelineList.addEventListener('click',event=>{if(event.target.closest('[data-remove-timeline]')){event.target.closest('[data-timeline-item]').remove();reindexTimeline();}});
+    form.addEventListener('submit',()=>{orderField.value=JSON.stringify(Array.from(imageList.querySelectorAll('.home-image-item')).map(card=>card.dataset.kind==='existing'?{kind:'existing',src:card.dataset.src}:{kind:'upload',index:Number(card.dataset.fileIndex)}));countField.value=timelineList.querySelectorAll('[data-timeline-item]').length;reindexTimeline();});
+})();
+</script>
 <script src="/admin.js"></script>
 <%- include('../footer.ejs') %>

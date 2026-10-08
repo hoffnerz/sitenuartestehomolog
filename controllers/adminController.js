@@ -1,6 +1,6 @@
 const pool = require('../db');
 const bcrypt = require('bcrypt');
-const { obterEstatisticas } = require('../middleware/estatisticas');
+const { obterEstatisticas, exportarCsv } = require('../middleware/estatisticas');
 const saltRounds = 10;
 const { removerArquivoAntigo } = require('../middleware/upload');
 const conteudoMetadata = require('../middleware/conteudoMetadata');
@@ -88,20 +88,36 @@ exports.salvarPaginaInicial = (req, res) => {
     try {
         const atual = conteudoMetadata.obterHomepage();
         const body = req.body;
-        const imagens = (req.files || []).map(file => '/uploads/' + file.filename);
+        const uploads = (req.files || []).map(file => '/uploads/' + file.filename);
+        let ordem;
+        if (body.homepage_image_order) {
+            try { ordem = JSON.parse(body.homepage_image_order); } catch (_) { return res.status(400).send('Ordem das imagens inválida'); }
+            if (!Array.isArray(ordem) || ordem.length > 60) return res.status(400).send('Lista de imagens inválida');
+        } else {
+            ordem = [...atual.hero.imagens.map(src => ({ kind: 'existing', src })), ...uploads.map((_, index) => ({ kind: 'upload', index }))];
+        }
+        const imagens = [];
+        for (const item of ordem) {
+            if (item && item.kind === 'existing' && atual.hero.imagens.includes(item.src) && !imagens.includes(item.src)) imagens.push(item.src);
+            if (item && item.kind === 'upload' && Number.isInteger(Number(item.index)) && uploads[Number(item.index)] && !imagens.includes(uploads[Number(item.index)])) imagens.push(uploads[Number(item.index)]);
+        }
+        const quantidadeMarcos = Number.parseInt(body.timeline_count, 10);
+        if (!Number.isInteger(quantidadeMarcos) || quantidadeMarcos < 0 || quantidadeMarcos > 80) return res.status(400).send('Quantidade de marcos inválida');
+        const timeline = Array.from({ length: quantidadeMarcos }, (_, i) => ({
+            ano: String(body['timeline_ano_' + i] || '').slice(0, 40),
+            texto: String(body['timeline_texto_' + i] || '').slice(0, 5000)
+        })).filter(item => item.ano.trim() || item.texto.trim());
         const homepage = {
             hero: {
-                etiqueta: body.hero_etiqueta || '', titulo: body.hero_titulo || '', descricao: body.hero_descricao || '',
-                botao1Texto: body.hero_botao1Texto || '', botao1Url: body.hero_botao1Url || '',
-                botao2Texto: body.hero_botao2Texto || '', botao2Url: body.hero_botao2Url || '',
-                imagens: imagens.length ? imagens : atual.hero.imagens
+                etiqueta: String(body.hero_etiqueta || '').slice(0, 120), titulo: String(body.hero_titulo || '').slice(0, 500), descricao: String(body.hero_descricao || '').slice(0, 3000),
+                botao1Texto: String(body.hero_botao1Texto || '').slice(0, 120), botao1Url: String(body.hero_botao1Url || '').slice(0, 500),
+                botao2Texto: String(body.hero_botao2Texto || '').slice(0, 120), botao2Url: String(body.hero_botao2Url || '').slice(0, 500), imagens
             },
-            timelineTitulo: body.timeline_titulo || '', timelineSubtitulo: body.timeline_subtitulo || '',
-            timeline: atual.timeline.map((item, i) => ({ ano: body['timeline_ano_' + i] || '', texto: body['timeline_texto_' + i] || '' })),
-            institucionalTitulo: body.institucional_titulo || '', institucionalSubtitulo: body.institucional_subtitulo || '',
+            timelineTitulo: String(body.timeline_titulo || '').slice(0, 120), timelineSubtitulo: String(body.timeline_subtitulo || '').slice(0, 120), timeline,
+            institucionalTitulo: String(body.institucional_titulo || '').slice(0, 120), institucionalSubtitulo: String(body.institucional_subtitulo || '').slice(0, 120),
             institucional: atual.institucional.map((item, i) => ({
-                titulo: body['inst_titulo_' + i] || '', texto: body['inst_texto_' + i] || '',
-                url: body['inst_url_' + i] || '', botao: body['inst_botao_' + i] || ''
+                titulo: String(body['inst_titulo_' + i] || '').slice(0, 200), texto: String(body['inst_texto_' + i] || '').slice(0, 3000),
+                url: String(body['inst_url_' + i] || '').slice(0, 500), botao: String(body['inst_botao_' + i] || '').slice(0, 120)
             }))
         };
         conteudoMetadata.salvarHomepage(homepage);
@@ -115,7 +131,7 @@ exports.salvarPaginaInicial = (req, res) => {
 exports.renderEstatisticas = (req, res) => {
     if (!req.session.autenticado) return res.redirect('/admin');
     try {
-        const estatisticas = obterEstatisticas();
+        const estatisticas = obterEstatisticas({ inicio: req.query.inicio, fim: req.query.fim });
         res.render('admin/estatisticas', {
             ...estatisticas,
             userPhoto: req.session.userPhoto
@@ -123,6 +139,19 @@ exports.renderEstatisticas = (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Erro ao carregar estatísticas');
+    }
+};
+
+exports.exportarEstatisticas = (req, res) => {
+    if (!req.session.autenticado) return res.redirect('/admin');
+    try {
+        const arquivo = exportarCsv({ inicio: req.query.inicio, fim: req.query.fim });
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="nuar-estatisticas-${arquivo.inicio}-${arquivo.fim}.csv"`);
+        res.send(arquivo.conteudo);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao exportar estatísticas');
     }
 };
 
